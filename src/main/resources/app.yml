@@ -1,0 +1,121 @@
+#server.port: 8080
+
+solon.app:
+  name: 'VideoServer'
+  group: 'VideoServer'
+
+# 以下为solon默认值
+solon.logging.appender:
+  console:
+    level: TRACE
+    enable: true #是否启用
+  file:
+    name: "logs/${solon.app.name}"
+    level: INFO
+    enable: true #是否启用
+    extension: ".log"   #(.log, .log.gz, .log.zip）
+    maxFileSize: "10 MB"
+    maxHistory: "7"
+
+# 记录器级别的配置
+solon.logging.logger:
+  "root": #默认记录器配置
+    level: WARN # 默认：TRACE
+  "com.afo.video.common.exception":
+    level: INFO
+  "com.zaxxer.hikari":
+    level: WARN  # 默认：WARN
+  "com.afo.video.mapper":
+    level: DEBUG # 输出SQL语句
+  "com.mybatisflex.core":
+    level: INFO
+  "sa-token":
+    level: INFO
+
+#设定最大的请求包大小（或表单项的值大小）//默认: 2m
+server.request.maxBodySize: 10mb #kb,mb
+#设定最大的上传文件大小
+server.request.maxFileSize: 10mb #kb,mb (默认使用 maxBodySize 配置值)
+#设定最大的请求头大小//默认: 8k
+server.request.maxHeaderSize: 8kb #kb,mb
+#设定上传使用临时文件（v2.7.2 后支持。v3.6.0 后失效，由 fileSizeThreshold 替代）
+server.request.useTempfile: false #默认 false
+#设定上传文件大小阀值（v3.6.0 后支持）
+server.request.fileSizeThreshold: 10mb #默认 512kb
+#solon.web:
+#  static:
+#    path: '/static/**'
+#    location: 'classpath:/static/'
+
+mybatis-flex.datasource:
+  default:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/video-server?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: 123
+
+mybatis-flex:
+  defaultDatasourceKey: default
+  typeAliasesPackage: # 必须要数组格式。。
+    - "com.afo.video.domain"
+  mapperLocations:
+    - "com.afo.video.mapper"
+  configuration:
+    cacheEnabled: false
+    mapUnderscoreToCamelCase: true
+  global-config:
+    printBanner: false
+    key-config:
+      keyType: "Generator"
+      value: "snowFlakeId"
+
+#分页组件的配置
+sqlhelper:
+  mybatis:
+    instrumentor:
+      dialect: "mysql"
+      cache-instrumented-sql: true
+      subquery-paging-start-flag: "[PAGING_StART]"
+      subquery-paging-end-flag: "[PAGING_END]"
+    pagination:
+      count: true
+      default-page-size: 10
+      use-last-page-if-page-no-out: true
+      count-suffix: _COUNT
+
+# sa-token配置
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: satoken
+  # token有效期，单位s 默认30天, -1代表永不过期
+  timeout: 2592000
+  # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+  active-timeout: -1
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true #旧版曾用名（allow-concurrent-login）
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: true
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+  # banner是否打印
+  is-print: false
+
+# s3插件配置
+solon.cloud.file.s3.file:
+  default: 'video'
+  buckets:
+    video:
+      endpoint: 'http://localhost:9000/'
+      regionId: 'None'
+      accessKey: 'g48qocK9fJSUrLENMby3'
+      secretKey: '6EtRwsBm3PqlhC75Xcjd08nykHSxbAuQrefv1pIz'
+      pathStyleAccessEnabled: false #minio 一般要设为 true
+      chunkedEncodingDisabled: false #一般要设为 true
+      accelerateModeEnabled: false
+      payloadSigningEnabled: false
+      dualstackEnabled: false
+      forceGlobalBucketAccessEnabled: false
+      useArnRegionEnabled: false
+      regionalUsEast1EndpointEnabled: false
