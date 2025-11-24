@@ -7,16 +7,11 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Table("video")
-public class Video extends BaseEntity {
+@Table("category")
+public class Category extends BaseEntity {
     @Id
     private Long id;
-    private Long userId;
-    private String title;
+    private String name;
     private String description;
-    private Long category_id;
-    private String fileUrl;
-    private String coverUrl;
-    private Integer duration; // 秒
     private Integer status;
 }

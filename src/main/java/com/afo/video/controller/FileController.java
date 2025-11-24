@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -89,7 +90,7 @@ public class FileController {
             video.setCoverUrl(fileUrl); // 暂时使用视频文件作为封面
             video.setDuration(0); // 时长待后续处理
             video.setStatus(1); // 设置为已发布
-            video.setCreateTime(LocalDateTime.now());
+            video.setCreateTime(new Date());
 
             // 插入数据库
             videoMapper.insert(video);
@@ -112,7 +113,7 @@ public class FileController {
      */
     @Get
     @Mapping("/downloadLocally/{videoId}")
-    public void downloadLocally(@Param("videoId") Long videoId, Context ctx) throws Throwable {
+    public void downloadLocally(@Path("videoId") Long videoId, Context ctx) throws Throwable {
         Video video = videoMapper.selectOneById(videoId);
         if (video == null) {
             ctx.render("视频不存在");
@@ -185,7 +186,7 @@ public class FileController {
             video.setCoverUrl(fileUrl); // 暂时使用视频文件作为封面
             video.setDuration(0); // 时长待后续处理
             video.setStatus(1); // 设置为已发布
-            video.setCreateTime(LocalDateTime.now());
+            video.setCreateTime(new Date());
 
             // 插入数据库
             videoMapper.insert(video);
@@ -209,7 +210,7 @@ public class FileController {
      */
     @Get
     @Mapping("/downloadCloud/{videoId}")
-    public void downloadCloud(@Param("videoId") Long videoId, Context ctx) throws Throwable {
+    public void downloadCloud(@Path("videoId") Long videoId, Context ctx) throws Throwable {
         // 检查文件服务是否可用
         if (CloudClient.file() == null) {
             ctx.render("文件服务不可用");

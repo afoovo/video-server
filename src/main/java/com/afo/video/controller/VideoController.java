@@ -2,12 +2,9 @@ package com.afo.video.controller;
 
 import com.afo.video.common.api.AjaxResult;
 import com.afo.video.domain.Video;
-import com.afo.video.mapper.VideoMapper;
+import com.afo.video.service.VideoService;
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryWrapper;
-import org.noear.solon.annotation.Controller;
-import org.noear.solon.annotation.Inject;
-import org.noear.solon.annotation.Mapping;
+import org.noear.solon.annotation.*;
 
 import java.util.List;
 
@@ -19,20 +16,18 @@ import java.util.List;
 public class VideoController {
 
     @Inject
-    VideoMapper videoMapper;
-
+    private VideoService videoService;
 
     /**
      * 查询所有视频
      *
      * @return 视频列表
      */
-    @Mapping("/listAll")
-    public Object listAll() {
-        List<Video> all = videoMapper.selectAll();
+    @Mapping("/list")
+    public Object list() {
+        List<Video> all = videoService.list();
         return AjaxResult.ok(all);
     }
-
 
     /**
      * 分页查询视频列表
@@ -41,28 +36,35 @@ public class VideoController {
      * @param pageSize 每页数量
      * @return 分页视频列表
      */
-    @Mapping("/paginate")
-    public Object paginate(int pageNum, int pageSize) {
-        //分页查询
-        QueryWrapper query = new QueryWrapper();
-        // 第一页查询（需要获取总记录数）
-        Page<Video> firstPage = videoMapper.paginate(pageNum, pageSize, query);
-        // 分页查询视频列表
-        long totalRow = firstPage.getTotalRow();
-        // 第二页及以后（传入已知的总记录数，避免重复查询）
-        Page<Video> secondPage = videoMapper.paginate(pageNum, pageSize, totalRow, query);
-        return AjaxResult.ok(firstPage);
+    @Mapping("/page")
+    public Object page(int pageNum, int pageSize) {
+        Page<Video> page = videoService.page(new Page<>(pageNum, pageSize));//需要new一个page
+        return AjaxResult.ok(page);
     }
 
     /**
      * 搜索相关视频（模糊查询）
      *
+     * @param name 搜索名称
      * @return 视频列表
      */
     @Mapping("/search/{name}")
-    public Object search(String name) {
-        // 查询视频列表
-        List<Video> videos = videoMapper.selectListByQuery(QueryWrapper.create().like(Video::getTitle, name));
+    public Object search(@Path("name") String name) {
+        List<Video> videos = videoService.search(name);
+        return AjaxResult.ok(videos);
+    }
+
+
+
+    /**
+     * 查询用户上传的视频列表
+     *
+     * @param userId 用户ID
+     * @return 视频列表
+     */
+     @Mapping("/user/{userId}")
+    public Object userVideoList(@Path("userId") Long userId) {
+        List<Video> videos = videoService.listByUserId(userId);
         return AjaxResult.ok(videos);
     }
 
@@ -74,10 +76,13 @@ public class VideoController {
      */
     @Mapping("/play")
     public Object play(Long videoId) {
-        Video video = videoMapper.selectOneById(videoId);
+        Video video = videoService.getById(videoId);
         if (video == null) {
             return AjaxResult.error("视频不存在");
         }
-        return AjaxResult.ok(video);
+        // 返回视频体
+        return AjaxResult.ok(video.getFileUrl());
     }
+
+
 }
