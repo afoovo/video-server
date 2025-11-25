@@ -5,6 +5,7 @@ import com.afo.video.domain.Video;
 import com.afo.video.service.VideoService;
 import com.mybatisflex.core.paginate.Page;
 import org.noear.solon.annotation.*;
+import org.noear.solon.validation.annotation.Valid;
 
 import java.util.List;
 
@@ -48,6 +49,8 @@ public class VideoController {
      * @param name 搜索名称
      * @return 视频列表
      */
+
+    @Valid
     @Mapping("/search/{name}")
     public Object search(@Path("name") String name) {
         List<Video> videos = videoService.search(name);
@@ -55,27 +58,15 @@ public class VideoController {
     }
 
 
-
-    /**
-     * 查询用户上传的视频列表
-     *
-     * @param userId 用户ID
-     * @return 视频列表
-     */
-     @Mapping("/user/{userId}")
-    public Object userVideoList(@Path("userId") Long userId) {
-        List<Video> videos = videoService.listByUserId(userId);
-        return AjaxResult.ok(videos);
-    }
-
     /**
      * 播放视频
      *
      * @param videoId 视频ID
      * @return 视频详情
      */
+    @Valid
     @Mapping("/play")
-    public Object play(Long videoId) {
+    public Object play(@Param("videoId") Long videoId) {
         Video video = videoService.getById(videoId);
         if (video == null) {
             return AjaxResult.error("视频不存在");

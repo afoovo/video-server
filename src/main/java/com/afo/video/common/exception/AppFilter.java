@@ -1,13 +1,13 @@
 package com.afo.video.common.exception;
 
-import org.noear.solon.annotation.Component;
+import org.noear.solon.annotation.Managed;
 import org.noear.solon.core.exception.StatusException;
 import org.noear.solon.core.handle.Context;
 import org.noear.solon.core.handle.Filter;
 import org.noear.solon.core.handle.FilterChain;
 import org.noear.solon.core.handle.Result;
 
-@Component //index 为顺序位（不加，则默认为0）
+@Managed //index 为顺序位（不加，则默认为0）
 public class AppFilter implements Filter {
     // 使用最底层的全局过滤
     @Override

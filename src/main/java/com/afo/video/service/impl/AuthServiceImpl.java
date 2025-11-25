@@ -1,0 +1,141 @@
+package com.afo.video.service.impl;
+
+import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
+import com.afo.video.common.api.AjaxJson;
+import com.afo.video.domain.User;
+import com.afo.video.mapper.UserMapper;
+import com.afo.video.service.AuthService;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.solon.service.impl.ServiceImpl;
+import org.noear.solon.Utils;
+import org.noear.solon.annotation.Inject;
+import org.noear.solon.annotation.Managed;
+import org.noear.solon.cloud.CloudClient;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.afo.video.domain.table.UserTableDef.USER;
+
+@Managed
+public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements AuthService {
+
+    @Inject
+    private UserMapper userMapper;
+
+    @Override
+    public AjaxJson login(String username, String password) {
+        // 参数校验
+        if (Utils.isEmpty(username) || Utils.isEmpty(password)) {
+            return AjaxJson.getError("用户名或密码不能为空");
+        }
+
+        // 查询用户 - 使用QueryWrapper构建查询条件
+        QueryWrapper query = QueryWrapper.create()
+                .where(USER.ACCOUNT.eq(username).or(USER.USER_NAME.eq(username)));
+        User user = userMapper.selectOneByQuery(query);
+
+        if (user == null) {
+            return AjaxJson.getError("用户不存在");
+        }
+
+        // 验证密码
+        if (!verifyPassword(password, user.getPassword(), user.getSalt())) {
+            return AjaxJson.getError("密码错误");
+        }
+
+        // 检查用户状态
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            return AjaxJson.getError("用户已被禁用");
+        }
+
+        // 登录成功，生成token
+        StpUtil.login(user.getId());
+
+        // 获取token信息
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+
+        // 返回登录结果
+        Map<String, Object> result = new HashMap<>();
+        result.put("token", tokenInfo.getTokenValue());
+        result.put("用户名", user.getUserName());
+
+        return AjaxJson.getSuccess("登录成功", result);
+    }
+
+    @Override
+    public AjaxJson register(String username, String password) {
+        // 参数校验
+        if (Utils.isEmpty(username) || Utils.isEmpty(password)) {
+            return AjaxJson.getError("用户名或密码不能为空");
+        }
+
+        // 检查用户名是否已存在
+        QueryWrapper query = QueryWrapper.create()
+                .where(USER.ACCOUNT.eq(username).or(USER.USER_NAME.eq(username)));
+        User existingUser = userMapper.selectOneByQuery(query);
+
+        if (existingUser != null) {
+            return AjaxJson.getError("用户名已存在");
+        }
+
+//        // 密码强度校验
+//        if (password.length() < 8) {
+//            return AjaxJson.getError("密码长度不能少于8位");
+//        }
+
+        // 创建新用户
+        User newUser = new User();
+        newUser.setId(CloudClient.id().generate());// 使用Solon-Cloud生成ID(默认实现为Snowflake)
+        newUser.setAccount(username);
+        newUser.setUserName(username);
+
+        // 生成密码盐和加密密码
+        String salt = Utils.guid();
+        String encryptedPassword = encryptPassword(password, salt);
+
+        newUser.setPassword(encryptedPassword);
+        newUser.setSalt(salt);
+        newUser.setStatus(1); // 启用状态
+        newUser.setSex("OTHER"); // 默认性别为其他
+
+        // 设置创建时间
+        newUser.setCreateTime(new Date());
+
+        // 保存用户
+        boolean success = userMapper.insert(newUser) > 0;
+
+        if (success) {
+            return AjaxJson.getSuccess("注册成功");
+        } else {
+            return AjaxJson.getError("注册失败");
+        }
+    }
+
+    @Override
+    public AjaxJson logout() {
+        //方法式验证，简化检查是否登录（checkLogin）、登出（logout）等
+        StpUtil.logout();//auth携带token，自动校验是否登录，未登录则直接返回
+        return AjaxJson.getSuccess("登出成功");
+    }
+
+    /**
+     * 加密密码
+     */
+    private String encryptPassword(String password, String salt) {
+        return Utils.md5(Utils.md5(password) + salt);
+    }
+
+    /**
+     * 验证密码
+     */
+    private boolean verifyPassword(String inputPassword, String storedPassword, String salt) {
+        if (Utils.isEmpty(storedPassword) || Utils.isEmpty(salt)) {
+            return false;
+        }
+        String encryptedInput = encryptPassword(inputPassword, salt);
+        return encryptedInput.equals(storedPassword);
+    }
+}

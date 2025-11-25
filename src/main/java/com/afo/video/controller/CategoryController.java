@@ -5,10 +5,16 @@ import com.afo.video.domain.Category;
 import com.afo.video.domain.Video;
 import com.afo.video.service.CategoryService;
 import com.afo.video.service.VideoService;
-import org.noear.solon.annotation.*;
+import org.noear.solon.annotation.Controller;
+import org.noear.solon.annotation.Inject;
+import org.noear.solon.annotation.Mapping;
+import org.noear.solon.annotation.Path;
 
 import java.util.List;
 
+/**
+ * 分类控制器
+ */
 @Controller
 @Mapping("/category")
 public class CategoryController {
@@ -39,6 +45,7 @@ public class CategoryController {
         Category category = categoryService.getById(id);
         return AjaxResult.ok(category);
     }
+
     /**
      * 查询分类视频列表
      *
@@ -46,34 +53,20 @@ public class CategoryController {
      * @return 视频列表
      */
     @Mapping("/{id}/videoList")
-    public Object videoList(@Path("id") Long id) {
+    public Object categoryVideoList(@Path("id") Long id) {
         List<Video> videos = videoService.listByCategoryId(id);
         return AjaxResult.ok(videos);
     }
 
     /**
-     * 创建分类
+     * 创建或更新分类
      *
      * @param category 分类信息
      * @return 创建结果
      */
-    @Mapping("/create")
-    public Object create(Category category) {
-        boolean result = categoryService.save(category);
-        return AjaxResult.ok(result);
-    }
-
-    /**
-     * 更新分类
-     *
-     * @param id       分类ID
-     * @param category 分类信息
-     * @return 更新结果
-     */
-    @Mapping("/update/{id}")
-    public Object update(@Path("id") Long id, Category category) {
-        category.setId(id);
-        boolean result = categoryService.updateById(category);
+    @Mapping("/saveOrUpdate")
+    public Object saveOrUpdate(Category category) {
+        boolean result = categoryService.saveOrUpdate(category);
         return AjaxResult.ok(result);
     }
 
@@ -88,6 +81,4 @@ public class CategoryController {
         boolean result = categoryService.removeById(id);
         return AjaxResult.ok(result);
     }
-
-
 }
