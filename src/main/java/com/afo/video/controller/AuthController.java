@@ -20,22 +20,22 @@ public class AuthController {
 
     /**
      * 登录
-     * @param username 用户名
+     * @param account 账号
      * @param password 密码
      */
     @Mapping("/login")
-    public AjaxJson login(@Param("username") String username, @Param("password") String password) {
-        return authService.login(username, password);
+    public AjaxJson login(@Param("account") String account, @Param("password") String password) {
+        return authService.login(account, password);
     }
 
     /**
      * 注册
-     * @param username 用户名
+     * @param account 账号
      * @param password 密码
      */
     @Mapping("/register")
-    public AjaxJson register(@Param("username") String username, @Param("password") String password) {
-        return authService.register(username, password);
+    public AjaxJson register(@Param("account") String account, @Param("password") String password) {
+        return authService.register(account, password);
     }
     /**
      * 登出

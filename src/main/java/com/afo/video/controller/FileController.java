@@ -1,6 +1,5 @@
 package com.afo.video.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.afo.video.common.api.AjaxResult;
 import com.afo.video.common.utils.ConfigureTransition;
@@ -41,26 +40,22 @@ public class FileController {
     /**
      * 文件上传本地
      *
-     * @param file   上传的视频文件
-     * @param cover  上传的封面文件
-     * @param title  视频标题
-     * @param desc   视频描述
+     * @param file        上传的视频文件
+     * @param cover       上传的封面文件
+     * @param title       视频标题
+     * @param description 视频描述
      * @return 上传结果
      */
     @Post
     @Mapping("/uploadLocally")
     @Valid
-    @SaCheckLogin
     public AjaxResult uploadLocally(@Param("file") UploadedFile file,
                                     @Param("cover") UploadedFile cover,
                                     @Param("title") String title,
-                                    @Param("description") String desc) {
+                                    @Param("description") String description) {
         try {
             // 获取当前登录用户ID
             Long userId = StpUtil.getLoginIdAsLong();
-            if (userId == null) {
-                return AjaxResult.error("用户未登录");
-            }
             System.out.println("userId = " + userId);
 
 
@@ -133,7 +128,7 @@ public class FileController {
             video.setId(videoId); // 使用生成的ID
             video.setUserId(userId);
             video.setTitle(title);
-            video.setDescription(desc);
+            video.setDescription(description);
             video.setFileUrl(videoFileUrl);
             video.setCoverUrl(coverUrl);
             video.setDuration(0); // 时长待后续处理，后端使用javaCV依赖太多太大，可能交给前端
@@ -156,26 +151,22 @@ public class FileController {
     /**
      * 文件上传到云存储
      *
-     * @param file   上传的视频文件
-     * @param cover  上传的封面文件
-     * @param title  视频标题
-     * @param desc   视频描述
+     * @param file        上传的视频文件
+     * @param cover       上传的封面文件
+     * @param title       视频标题
+     * @param description 视频描述
      * @return 上传结果
      */
     @Post
     @Mapping("/uploadCloud")
     @Valid
-    @SaCheckLogin
     public AjaxResult uploadCloud(@Param("file") UploadedFile file,
                                   @Param("cover") UploadedFile cover,
                                   @Param("title") String title,
-                                  @Param("description") String desc) {
+                                  @Param("description") String description) {
         try {
             // 获取当前登录用户ID
             Long userId = StpUtil.getLoginIdAsLong();
-            if (userId == null) {
-                return AjaxResult.error("用户未登录");
-            }
 
             // 检查文件服务是否可用
             if (CloudClient.file() == null) {
@@ -252,7 +243,7 @@ public class FileController {
             video.setId(videoId); // 使用生成的ID
             video.setUserId(userId);
             video.setTitle(title);
-            video.setDescription(desc);
+            video.setDescription(description);
             video.setFileUrl(videoFileUrl);
             video.setCoverUrl(coverUrl);
             video.setDuration(0); // 时长待后续处理

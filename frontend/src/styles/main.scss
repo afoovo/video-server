@@ -1,0 +1,103 @@
+@use './variables' as *;
+@use './mixins' as *;
+@use 'layout';
+@use 'sass:color';
+// 重置样式
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: $font-size-base;
+  font-family: $font-family;
+  line-height: $line-height-base;
+  color: $text-color;
+  background-color: $background-color;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  @include custom-scrollbar;
+}
+
+// 链接样式
+a {
+  color: $primary-color;
+  text-decoration: none;
+
+  &:hover {
+    color: color.adjust($primary-color, $lightness: 10%);
+  }
+}
+
+// 图片样式
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+// 按钮样式
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// 输入框样式
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+
+  &::placeholder {
+    color: $text-color-placeholder;
+  }
+}
+
+// 工具类
+.text-truncate {
+  @include text-truncate;
+}
+
+.text-truncate-2 {
+  @include text-truncate(2);
+}
+
+.text-truncate-3 {
+  @include text-truncate(3);
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+.flex-between {
+  @include flex-between;
+}
+
+// Element Plus 主题变量覆盖
+:root {
+  --el-color-primary: #{$primary-color};
+  --el-border-radius-base: #{$border-radius-md};
+  --el-font-size-base: #{$font-size-base};
+  --el-text-color-primary: #{$text-color};
+  --el-text-color-regular: #{$text-color-secondary};
+  --el-border-color: #{$border-color};
+  --el-background-color: #{$background-color};
+  --el-disabled-bg-color: #{$border-color-light};
+}

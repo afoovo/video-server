@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.noear.solon.examples</groupId>
+    <groupId>org.noear</groupId>
     <artifactId>video-server</artifactId>
     <version>demo</version>
     <packaging>jar</packaging>
@@ -37,16 +37,11 @@
             <version>${mybatis-flex.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>mybatis-sqlhelper-solon-plugin</artifactId>
-        </dependency>
-
 <!--        <dependency>-->
 <!--            <groupId>org.noear</groupId>-->
-<!--            <artifactId>solon-logging-simple</artifactId>-->
+<!--            <artifactId>mybatis-sqlhelper-solon-plugin</artifactId>-->
 <!--        </dependency>-->
-<!--        修改为官方推荐的logback-->
+
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-logging-logback</artifactId>
@@ -89,7 +84,7 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
-<!--        aws-s3协议，兼容minio、Rust-FS-->
+        <!--        aws-s3协议，兼容minio、Rust-FS-->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>file-s3-solon-cloud-plugin</artifactId>
@@ -101,7 +96,7 @@
             <artifactId>sa-token-solon-plugin</artifactId>
             <version>1.44.0</version>
         </dependency>
-<!--        分布式id生成，基于snowflake算法，不导入不能用CloudClient.id().generate()-->
+        <!--        分布式id生成，基于snowflake算法，不导入不能用CloudClient.id().generate()-->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>snowflake-id-solon-cloud-plugin</artifactId>
@@ -133,6 +128,10 @@
             <plugin>
                 <groupId>org.noear</groupId>
                 <artifactId>solon-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定启动主类 -->
+                    <!-- <mainClass>com.afo.video.App</mainClass>-->
+                </configuration>
             </plugin>
         </plugins>
     </build>

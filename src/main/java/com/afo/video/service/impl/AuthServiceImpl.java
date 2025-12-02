@@ -26,15 +26,15 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
     private UserMapper userMapper;
 
     @Override
-    public AjaxJson login(String username, String password) {
+    public AjaxJson login(String account, String password) {
         // 参数校验
-        if (Utils.isEmpty(username) || Utils.isEmpty(password)) {
-            return AjaxJson.getError("用户名或密码不能为空");
+        if (Utils.isEmpty(account) || Utils.isEmpty(password)) {
+            return AjaxJson.getError("账号或密码不能为空");
         }
 
         // 查询用户 - 使用QueryWrapper构建查询条件
         QueryWrapper query = QueryWrapper.create()
-                .where(USER.ACCOUNT.eq(username).or(USER.USER_NAME.eq(username)));
+                .where(USER.ACCOUNT.eq(account).or(USER.USER_NAME.eq(account)));
         User user = userMapper.selectOneByQuery(query);
 
         if (user == null) {
@@ -60,25 +60,25 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
         // 返回登录结果
         Map<String, Object> result = new HashMap<>();
         result.put("token", tokenInfo.getTokenValue());
-        result.put("用户名", user.getUserName());
+        result.put("user", user);
 
         return AjaxJson.getSuccess("登录成功", result);
     }
 
     @Override
-    public AjaxJson register(String username, String password) {
+    public AjaxJson register(String account, String password) {
         // 参数校验
-        if (Utils.isEmpty(username) || Utils.isEmpty(password)) {
-            return AjaxJson.getError("用户名或密码不能为空");
+        if (Utils.isEmpty(account) || Utils.isEmpty(password)) {
+            return AjaxJson.getError("账号或密码不能为空");
         }
 
-        // 检查用户名是否已存在
+        // 检查账号是否已存在
         QueryWrapper query = QueryWrapper.create()
-                .where(USER.ACCOUNT.eq(username).or(USER.USER_NAME.eq(username)));
+                .where(USER.ACCOUNT.eq(account).or(USER.USER_NAME.eq(account)));
         User existingUser = userMapper.selectOneByQuery(query);
 
         if (existingUser != null) {
-            return AjaxJson.getError("用户名已存在");
+            return AjaxJson.getError("账号已存在");
         }
 
 //        // 密码强度校验
@@ -89,8 +89,8 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
         // 创建新用户
         User newUser = new User();
         newUser.setId(CloudClient.id().generate());// 使用Solon-Cloud生成ID(默认实现为Snowflake)
-        newUser.setAccount(username);
-        newUser.setUserName(username);
+        newUser.setAccount(account);
+        newUser.setUserName(account);
 
         // 生成密码盐和加密密码
         String salt = Utils.guid();

@@ -1,0 +1,187 @@
+<template>
+  <div class="user-info-display" :class="{ detailed: detailed }">
+    <el-avatar
+      :size="size"
+      :src="avatarUrl"
+      :alt="user?.username || '未知用户'"
+      @error="handleAvatarError"
+    />
+    <div class="user-details">
+      <div class="username">
+        {{ user?.username || '未知用户' }}
+      </div>
+      <div v-if="detailed && user?.bio" class="bio">
+        {{ user.bio || '这个人很懒，什么都没写~' }}
+      </div>
+      <div v-if="showFollowers && user?.followerCount !== undefined" class="followers">
+        {{ formatNumber(user.followerCount) }} 位关注者
+      </div>
+      <div v-if="detailed" class="stats">
+        <div class="stat-item">
+          <span class="count">{{ user?.videoCount || 0 }}</span>
+          <span class="label">视频</span>
+        </div>
+        <div class="stat-item">
+          <span class="count">{{ user?.followerCount || 0 }}</span>
+          <span class="label">粉丝</span>
+        </div>
+        <div class="stat-item">
+          <span class="count">{{ user?.followingCount || 0 }}</span>
+          <span class="label">关注</span>
+        </div>
+      </div>
+    </div>
+    <el-button
+      v-if="showFollowButton && user?.id"
+      :type="user.followed ? 'default' : 'primary'"
+      :size="buttonSize"
+      @click="handleFollow"
+    >
+      {{ user.followed ? '已关注' : '关注' }}
+    </el-button>
+  </div>
+</template>
+
+<script setup lang="ts">
+  import { computed } from 'vue';
+  import { formatNumber } from '@/utils/format';
+  import { followUser, unfollowUser } from '@/api/user';
+  import { ElMessage } from 'element-plus';
+  import { useUserStore } from '@/stores/user';
+
+  // 组件逻辑
+  interface UserInfo {
+    id?: string | number;
+    username?: string;
+    avatar?: string;
+    bio?: string;
+    followerCount?: number;
+    followingCount?: number;
+    videoCount?: number;
+    followed?: boolean;
+  }
+
+  const props = defineProps<{
+    user?: UserInfo;
+    size?: number | 'large' | 'default' | 'small';
+    showFollowers?: boolean;
+    showFollowButton?: boolean;
+    buttonSize?: 'large' | 'default' | 'small';
+    detailed?: boolean;
+  }>();
+
+  const emit = defineEmits<{
+    follow: [];
+    unfollow: [];
+    error: [error: Error];
+  }>();
+
+  const userStore = useUserStore();
+
+  // 计算头像URL
+  const avatarUrl = computed(() => {
+    if (!props.user?.avatar) {
+      return new URL('@/assets/default-avatar.png', import.meta.url).href;
+    }
+    // 确保头像URL通过/api代理访问
+    return `/api${props.user.avatar}`;
+  });
+
+  // 处理关注/取消关注
+  const handleFollow = async () => {
+    if (!props.user?.id || !userStore.isLoggedIn) {
+      ElMessage.warning('请先登录');
+      return;
+    }
+
+    try {
+      if (props.user.followed) {
+        await unfollowUser(props.user.id);
+        emit('unfollow');
+      } else {
+        await followUser(props.user.id);
+        emit('follow');
+      }
+    } catch (error) {
+      console.error('操作关注状态失败:', error);
+      ElMessage.error('操作失败，请重试');
+      emit('error', error as Error);
+    }
+  };
+
+  // 处理头像加载错误
+  const handleAvatarError = (e: Event) => {
+    const img = e.target as HTMLImageElement;
+    if (img) {
+      img.src = new URL('@/assets/default-avatar.png', import.meta.url).href;
+      // 防止无限循环错误
+      img.onerror = null;
+    }
+  };
+</script>
+
+<style scoped>
+  .user-info-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-info-display.detailed {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .user-info-display.detailed .user-details {
+    gap: 0.5rem;
+  }
+
+  .username {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .user-info-display.detailed .username {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .followers {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .bio {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+
+  .stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 0.5rem;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .count {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+</style>

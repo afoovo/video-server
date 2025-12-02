@@ -61,5 +61,6 @@ nbdist/
 # 
 solon-examples/
 murky/
-.trae/
-static/uploads/**
+static/uploads/**!/murky-master/
+/solon-examples/
+/murky-master/
