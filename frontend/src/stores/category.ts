@@ -4,12 +4,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import {
+  type Category,
+  deleteCategory,
   getCategories,
   getCategoryDetail,
   getCategoryVideos,
   saveOrUpdateCategory,
-  deleteCategory,
-  type Category,
 } from '@/api/category';
 import type { Video } from '@/types/video';
 
@@ -42,8 +42,7 @@ export const useCategoryStore = defineStore('category', () => {
   async function fetchCategoryDetail(id: number | string): Promise<void> {
     try {
       loading.value = true;
-      const data = await getCategoryDetail(id);
-      currentCategory.value = data;
+      currentCategory.value = await getCategoryDetail(id);
     } catch (error) {
       console.error('获取分类详情失败:', error);
       throw error;

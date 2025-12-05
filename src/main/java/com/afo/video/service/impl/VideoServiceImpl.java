@@ -18,12 +18,12 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
     private VideoMapper videoMapper;
 
     @Override
-    public List<Video> search(String name) {
+    public List<Video> search(String keyword) {
         QueryWrapper queryWrapper = QueryWrapper.create()
                 .select()
                 .from(VIDEO)
-                .where(VIDEO.TITLE.like(name))
-                .or(VIDEO.DESCRIPTION.like(name));
+                .where(VIDEO.TITLE.like(keyword))
+                .or(VIDEO.DESCRIPTION.like(keyword));
 
         return videoMapper.selectListByQuery(queryWrapper);
     }

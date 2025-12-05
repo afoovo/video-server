@@ -12,7 +12,7 @@ import java.util.List;
 @Managed
 public interface VideoService extends IService<Video> {
 
-    List<Video> search(String name);
+    List<Video> search(String keyword);
 
     List<Video> listByCategoryId(Long id);
 

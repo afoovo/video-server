@@ -45,37 +45,13 @@ export function updateUserStatus(id: number | string, status: number): Promise<A
 }
 
 /**
- * 检查是否已关注用户
- * @param {number|string} id - 用户ID
- * @returns {Promise<ApiResponse<{ isFollowing: boolean }>>} 是否关注状态
+ * 模糊搜索用户列表
+ * @param {string} keyword - 搜索关键词
+ * @returns {Promise<User[]>} 用户列表
  */
-export function isFollowing(id: number | string): Promise<ApiResponse<{ isFollowing: boolean }>> {
+export function searchUsers(keyword: string): Promise<User[]> {
   return request({
-    url: `/users/${id}/follow`,
+    url: `/user/search/${keyword}`,
     method: 'get',
-  });
-}
-
-/**
- * 关注用户
- * @param {number|string} id - 用户ID
- * @returns {Promise<ApiResponse<void>>} 操作结果
- */
-export function followUser(id: number | string): Promise<ApiResponse<void>> {
-  return request({
-    url: `/users/${id}/follow`,
-    method: 'post',
-  });
-}
-
-/**
- * 取消关注用户
- * @param {number|string} id - 用户ID
- * @returns {Promise<ApiResponse<void>>} 操作结果
- */
-export function unfollowUser(id: number | string): Promise<ApiResponse<void>> {
-  return request({
-    url: `/users/${id}/follow`,
-    method: 'delete',
   });
 }

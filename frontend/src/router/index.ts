@@ -48,6 +48,15 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/search',
+    name: 'search',
+    component: () => import('@/views/SearchResults.vue').then(m => m.default || m),
+    meta: {
+      title: '搜索结果',
+      keepAlive: false,
+    },
+  },
+  {
     path: '/video/:id',
     name: 'video-detail',
     component: () => import('@/components/video/VideoDetail.vue').then(m => m.default || m),

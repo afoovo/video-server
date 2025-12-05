@@ -123,13 +123,13 @@ export function getUserVideos(userId: number | string): Promise<Video[]> {
 }
 
 /**
- * 搜索视频
- * @param {string} name - 搜索名称
+ * 模糊搜索视频
+ * @param {string} keyword - 搜索关键词
  * @returns {Promise<Video[]>}
  */
-export function searchVideos(name: string): Promise<Video[]> {
+export function searchVideos(keyword: string): Promise<Video[]> {
   return request({
-    url: `/video/search/${name}`,
+    url: `/video/search/${keyword}`,
     method: 'get',
   });
 }

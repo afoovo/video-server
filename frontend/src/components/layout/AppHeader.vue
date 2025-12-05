@@ -51,13 +51,14 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { ref, computed, watch } from 'vue';
+  import { useRouter, useRoute } from 'vue-router';
   import { Search, Plus } from '@element-plus/icons-vue';
   import { useUserStore } from '@/stores/user';
   import { ElMessage } from 'element-plus';
 
   const router = useRouter();
+  const route = useRoute();
   const userStore = useUserStore();
   const searchQuery = ref('');
 
@@ -65,6 +66,13 @@
   const isLoggedIn = computed(() => userStore.isLoggedIn);
   const username = computed(() => userStore.username);
   const userAvatar = computed(() => userStore.avatar);
+
+  // 监听路由变化，当离开搜索页面时清空搜索框
+  watch(() => route.path, (newPath, oldPath) => {
+    if (oldPath === '/search' && newPath !== '/search') {
+      searchQuery.value = '';
+    }
+  });
 
   const handleSearch = () => {
     if (searchQuery.value.trim()) {
@@ -122,7 +130,7 @@
   @use 'sass:color';
 
   .app-header {
-    height: vars.$header-height;
+    //height: vars.$header-height;
     background-color: $white;
     border-bottom: 1px solid $border-color;
     position: sticky;

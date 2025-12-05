@@ -13,7 +13,7 @@ import type { LoginForm, RegisterForm, User, AuthResponse } from '@/types/user';
 export function login(data: LoginForm): Promise<AuthResponse> {
   return request({
     url: '/auth/login',
-    method: 'get',
+    method: 'post',
     params: data,
   });
 }
@@ -26,8 +26,8 @@ export function login(data: LoginForm): Promise<AuthResponse> {
 export function register(data: RegisterForm): Promise<AuthResponse> {
   return request({
     url: '/auth/register',
-    method: 'get',
-    params: data,
+    method: 'post',
+    data,
   });
 }
 

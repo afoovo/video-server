@@ -48,6 +48,18 @@ public class UserController {
     }
 
     /**
+     * 模糊查询用户列表
+     *
+     * @param keyword 模糊查询关键词
+     * @return 用户列表
+     */
+    @Mapping("/search/{keyword}")
+    public Object search(@Path("keyword") String keyword) {
+        List<User> users = userService.search(keyword);
+        return AjaxResult.ok(users);
+    }
+
+    /**
      * 根据ID获取用户
      *
      * @param id 用户ID

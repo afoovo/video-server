@@ -41,7 +41,7 @@
         <el-avatar :src="comment.user?.avatar" :size="40" />
         <div class="comment-content">
           <div class="comment-header">
-            <span class="username">{{ comment.user?.username }}</span>
+            <span class="userName">{{ comment.user?.userName }}</span>
             <span class="time">{{ formatTime(comment.createTime) }}</span>
           </div>
           <div class="comment-text">
@@ -68,12 +68,12 @@
               <el-avatar :src="reply.user?.avatar" :size="32" />
               <div class="reply-content">
                 <div class="reply-header">
-                  <span class="username">{{ reply.user?.username }}</span>
+                  <span class="userName">{{ reply.user?.userName }}</span>
                   <span class="time">{{ formatTime(reply.createTime) }}</span>
                 </div>
                 <div class="reply-text">
                   <template v-if="reply.replyTo">
-                    回复 <span class="reply-to">@{{ reply.replyTo.username }}</span
+                    回复 <span class="reply-to">@{{ reply.replyTo.userName }}</span
                     >：
                   </template>
                   {{ reply.content }}
@@ -107,7 +107,7 @@
               v-model="replyText"
               type="textarea"
               :rows="2"
-              :placeholder="replyToUser ? `回复 @${replyToUser.username}` : '发表回复...'"
+              :placeholder="replyToUser ? `回复 @${replyToUser.userName}` : '发表回复...'"
               :maxlength="500"
               show-word-limit
               @keyup.enter.ctrl="handleSubmitReply"
@@ -253,7 +253,7 @@
         userId: comment.userId,
         user: comment.user || {
           id: comment.userId,
-          username: '未知用户',
+          userName: '未知用户',
           avatar: '/static/default/avatars/default.jpg',
         },
         likesCount: comment.likesCount || 0,
@@ -264,7 +264,7 @@
               ...reply,
               user: reply.user || {
                 id: reply.userId,
-                username: '未知用户',
+                userName: '未知用户',
                 avatar: '/static/default/avatars/default.jpg',
               },
               likesCount: reply.likesCount || 0,

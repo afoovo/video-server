@@ -102,7 +102,7 @@ public class FileController {
             String videoFileUrl = "/uploads/" + folderName + "/" + newVideoFileName;
 
             // 处理封面文件
-            String coverUrl = null;
+            String coverUrl;
             if (cover != null && !cover.isEmpty()) {
                 // 检查封面文件类型是否为图片
                 String coverContentType = cover.getContentType();
@@ -208,7 +208,7 @@ public class FileController {
             String videoFileUrl = CloudClient.file().getTempUrl(newVideoFileName, Duration.ofHours(1L));
 
             // 处理封面文件
-            String coverUrl = null;
+            String coverUrl;
             if (cover != null && !cover.isEmpty()) {
                 // 检查封面文件类型是否为图片
                 String coverContentType = cover.getContentType();

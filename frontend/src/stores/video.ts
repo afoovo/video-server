@@ -17,7 +17,11 @@ export const useVideoStore = defineStore('video', () => {
   const currentVideo = ref<VideoDetail | null>(null);
   const loading = ref<boolean>(false);
   const total = ref<number>(0);
-  const userStore = useUserStore();
+  
+  // 搜索相关状态
+  const searchResults = ref<Video[]>([]);
+  const searchLoading = ref<boolean>(false);
+  const searchKeyword = ref<string>('');
 
   // 获取视频列表
   async function fetchVideos(params: { pageNum?: number; pageSize?: number }): Promise<void> {
@@ -83,17 +87,26 @@ export const useVideoStore = defineStore('video', () => {
   }
 
   // 搜索视频
-  async function searchVideoList(name: string): Promise<void> {
+  async function searchVideoList(name: string): Promise<Video[]> {
     try {
-      loading.value = true;
+      searchLoading.value = true;
+      searchKeyword.value = name;
       const data = await searchVideos(name);
-      videos.value = data || [];
+      searchResults.value = data || [];
+      return searchResults.value;
     } catch (error) {
       console.error('搜索视频失败:', error);
+      searchResults.value = [];
       throw error;
     } finally {
-      loading.value = false;
+      searchLoading.value = false;
     }
+  }
+
+  // 清除搜索结果
+  function clearSearchResults(): void {
+    searchResults.value = [];
+    searchKeyword.value = '';
   }
 
   // 上传视频到本地
@@ -176,11 +189,15 @@ export const useVideoStore = defineStore('video', () => {
     currentVideo,
     loading,
     total,
+    searchResults,
+    searchLoading,
+    searchKeyword,
     fetchVideos,
     fetchAllVideos,
     fetchVideoDetail,
     fetchUserVideos,
     searchVideoList,
+    clearSearchResults,
     uploadVideoToLocal,
     uploadVideoToCloudStorage,
     addToHistory,

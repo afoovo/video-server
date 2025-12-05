@@ -3,31 +3,20 @@
     <el-avatar
       :size="size"
       :src="avatarUrl"
-      :alt="user?.username || '未知用户'"
+      :alt="user?.userName || '未知用户'"
       @error="handleAvatarError"
     />
     <div class="user-details">
       <div class="username">
-        {{ user?.username || '未知用户' }}
+        {{ user?.userName || '未知用户' }}
       </div>
       <div v-if="detailed && user?.bio" class="bio">
         {{ user.bio || '这个人很懒，什么都没写~' }}
-      </div>
-      <div v-if="showFollowers && user?.followerCount !== undefined" class="followers">
-        {{ formatNumber(user.followerCount) }} 位关注者
       </div>
       <div v-if="detailed" class="stats">
         <div class="stat-item">
           <span class="count">{{ user?.videoCount || 0 }}</span>
           <span class="label">视频</span>
-        </div>
-        <div class="stat-item">
-          <span class="count">{{ user?.followerCount || 0 }}</span>
-          <span class="label">粉丝</span>
-        </div>
-        <div class="stat-item">
-          <span class="count">{{ user?.followingCount || 0 }}</span>
-          <span class="label">关注</span>
         </div>
       </div>
     </div>
@@ -37,22 +26,19 @@
       :size="buttonSize"
       @click="handleFollow"
     >
-      {{ user.followed ? '已关注' : '关注' }}
     </el-button>
   </div>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { formatNumber } from '@/utils/format';
-  import { followUser, unfollowUser } from '@/api/user';
   import { ElMessage } from 'element-plus';
   import { useUserStore } from '@/stores/user';
 
   // 组件逻辑
   interface UserInfo {
     id?: string | number;
-    username?: string;
+    userName?: string;
     avatar?: string;
     bio?: string;
     followerCount?: number;
@@ -68,12 +54,6 @@
     showFollowButton?: boolean;
     buttonSize?: 'large' | 'default' | 'small';
     detailed?: boolean;
-  }>();
-
-  const emit = defineEmits<{
-    follow: [];
-    unfollow: [];
-    error: [error: Error];
   }>();
 
   const userStore = useUserStore();
@@ -92,20 +72,6 @@
     if (!props.user?.id || !userStore.isLoggedIn) {
       ElMessage.warning('请先登录');
       return;
-    }
-
-    try {
-      if (props.user.followed) {
-        await unfollowUser(props.user.id);
-        emit('unfollow');
-      } else {
-        await followUser(props.user.id);
-        emit('follow');
-      }
-    } catch (error) {
-      console.error('操作关注状态失败:', error);
-      ElMessage.error('操作失败，请重试');
-      emit('error', error as Error);
     }
   };
 
@@ -151,11 +117,6 @@
   .user-info-display.detailed .username {
     font-size: 1.5rem;
     font-weight: bold;
-  }
-
-  .followers {
-    font-size: 14px;
-    color: #666;
   }
 
   .bio {

@@ -47,14 +47,6 @@ export interface VideoUploadForm {
   cover: File | null;
 }
 
-export interface VideoProgress {
-  currentTime: number;
-  duration: number;
-  percentage: number;
-  playedSeconds: number;
-  remainingSeconds: number;
-}
-
 export interface VideoFilter {
   keyword?: string;
   category?: string;

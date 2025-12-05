@@ -49,16 +49,14 @@ public class VideoController {
     }
 
     /**
-     * 搜索相关视频（模糊查询）
+     * 模糊查询视频列表
      *
-     * @param name 搜索名称
+     * @param keyword 模糊查询关键词
      * @return 视频列表
      */
-
-    @Valid
-    @Mapping("/search/{name}")
-    public Object search(@Path("name") String name) {
-        List<Video> videos = videoService.search(name);
+    @Mapping("/search/{keyword}")
+    public Object search(@Path("keyword") String keyword) {
+        List<Video> videos = videoService.search(keyword);
         return AjaxResult.ok(videos);
     }
 

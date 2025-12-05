@@ -103,8 +103,17 @@
   };
 
   const handleSearch = () => {
-    currentPage.value = 1;
-    fetchVideos();
+    if (keyword.value.trim()) {
+      // 如果有搜索关键词，跳转到搜索结果页
+      router.push({
+        name: 'search',
+        query: { q: keyword.value.trim() }
+      });
+    } else {
+      // 如果搜索框为空，重置当前页面
+      currentPage.value = 1;
+      fetchVideos();
+    }
   };
 
   const handleVideoClick = (video: Video) => {

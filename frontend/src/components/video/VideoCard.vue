@@ -28,12 +28,12 @@
       </h3>
       <div class="meta">
         <div class="uploader" @click.stop="handleUploaderClick">
-          <!-- <UserInfoDisplay
+          <UserInfoDisplay
             :user="video.user"
             :size="24"
             :show-followers="false"
             :show-follow-button="false"
-          /> -->
+          />
         </div>
         <div class="stats">
           <span class="upload-time">{{
@@ -49,10 +49,9 @@
   import { View, Star } from '@element-plus/icons-vue';
   import { formatNumber, formatTime, formatDuration } from '@/utils/format';
   // 导入默认资源，使用require语法避免类型问题
-  const defaultAvatar = new URL('@/assets/default-avatar.png', import.meta.url).href;
   const defaultCover = new URL('@/assets/default-cover.jpg', import.meta.url).href;
 
-  // import UserInfoDisplay from '@/components/common/UserInfoDisplay.vue';
+  import UserInfoDisplay from '@/components/common/UserInfoDisplay.vue';
 
   // 为VideoCard定义独立的Props接口，避免与Video接口冲突
   interface VideoCardProps {
@@ -67,7 +66,7 @@
       createTime?: string | Date;
       user?: {
         id?: string;
-        username?: string;
+        userName?: string;
         avatar?: string;
       };
     };
