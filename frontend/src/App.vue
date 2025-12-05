@@ -15,6 +15,12 @@
 <script setup>
   import AppHeader from '@/components/layout/AppHeader.vue';
   import AppFooter from '@/components/layout/AppFooter.vue';
+  import { useUserStore } from '@/stores/user';
+  // 应用初始化时加载用户状态
+  onMounted(async () => {
+    const userStore = useUserStore(); //pinia推荐做法
+    await userStore.initialize();
+  });
 </script>
 
 <style lang="scss">

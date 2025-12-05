@@ -52,7 +52,7 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRouter, useRoute, createRouter as $router } from 'vue-router';
   import { Search, Plus } from '@element-plus/icons-vue';
   import { useUserStore } from '@/stores/user';
   import { ElMessage } from 'element-plus';
@@ -68,11 +68,14 @@
   const userAvatar = computed(() => userStore.avatar);
 
   // 监听路由变化，当离开搜索页面时清空搜索框
-  watch(() => route.path, (newPath, oldPath) => {
-    if (oldPath === '/search' && newPath !== '/search') {
-      searchQuery.value = '';
+  watch(
+    () => route.path,
+    (newPath, oldPath) => {
+      if (oldPath === '/search' && newPath !== '/search') {
+        searchQuery.value = '';
+      }
     }
-  });
+  );
 
   const handleSearch = () => {
     if (searchQuery.value.trim()) {
@@ -105,7 +108,7 @@
   const handleLogout = async () => {
     try {
       await userStore.logout();
-      router.push('/login');
+      await router.push('/login');
     } catch (error) {
       console.error('退出失败:', error);
       ElMessage.error('退出失败，请重试');

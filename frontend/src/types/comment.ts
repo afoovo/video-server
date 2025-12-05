@@ -1,13 +1,10 @@
 // 评论类型定义
 
-import type { UserInfo } from './video';
-
 export interface Comment {
   id: string;
   content: string;
   videoId: string;
   userId: string;
-  user: UserInfo;
   createdAt: string;
   updatedAt?: string;
   likeCount: number;

@@ -22,7 +22,7 @@
       </el-button>
     </div>
     <div v-else class="login-tip">
-      <el-link type="primary" @click="$router.push('/login')"> 登录 </el-link>
+      <el-link type="primary" @click="$router.push('/login')">登录</el-link>
       后发表评论
     </div>
 
@@ -31,8 +31,8 @@
       <div class="comment-header">
         <span class="total">{{ total }} 条评论</span>
         <el-radio-group v-model="sortBy" size="small" @change="handleSortChange">
-          <el-radio-button value="latest"> 最新 </el-radio-button>
-          <el-radio-button value="hot"> 最热 </el-radio-button>
+          <el-radio-button value="latest">最新</el-radio-button>
+          <el-radio-button value="hot">最热</el-radio-button>
         </el-radio-group>
       </div>
 
@@ -53,10 +53,12 @@
               :type="comment.liked ? 'primary' : 'default'"
               @click="handleLike(comment)"
             >
-              <el-icon><Star /></el-icon>
+              <el-icon>
+                <Star />
+              </el-icon>
               {{ formatNumber(comment.likesCount) }}
             </el-button>
-            <el-button link @click="handleReply(comment)"> 回复 </el-button>
+            <el-button link @click="handleReply(comment)"> 回复</el-button>
             <el-button v-if="canDelete(comment)" link type="danger" @click="handleDelete(comment)">
               删除
             </el-button>
@@ -84,10 +86,12 @@
                     :type="reply.liked ? 'primary' : 'default'"
                     @click="handleLike(reply)"
                   >
-                    <el-icon><Star /></el-icon>
+                    <el-icon>
+                      <Star />
+                    </el-icon>
                     {{ formatNumber(reply.likesCount) }}
                   </el-button>
-                  <el-button link @click="handleReply(comment, reply)"> 回复 </el-button>
+                  <el-button link @click="handleReply(comment, reply)"> 回复</el-button>
                   <el-button
                     v-if="canDelete(reply)"
                     link
@@ -113,7 +117,7 @@
               @keyup.enter.ctrl="handleSubmitReply"
             />
             <div class="reply-actions">
-              <el-button @click="cancelReply"> 取消 </el-button>
+              <el-button @click="cancelReply">取消</el-button>
               <el-button
                 type="primary"
                 :disabled="!replyText.trim()"
@@ -143,14 +147,13 @@
 </template>
 
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/stores/user';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { Star } from '@element-plus/icons-vue';
   import { formatNumber, formatTime } from '@/utils/format';
-  import { getVideoComments, createComment, deleteComment, likeComment } from '@/api/comment';
-  import request from '@/utils/request';
+  import { createComment, deleteComment, getVideoComments, likeComment } from '@/api/comment';
 
   const props = defineProps({
     videoId: {

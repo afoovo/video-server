@@ -1,11 +1,6 @@
 <template>
   <div class="user-info-display" :class="{ detailed: detailed }">
-    <el-avatar
-      :size="size"
-      :src="avatarUrl"
-      :alt="user?.userName || '未知用户'"
-      @error="handleAvatarError"
-    />
+    <el-avatar :src="avatarUrl" :alt="user?.userName || '未知用户'" @error="handleAvatarError" />
     <div class="user-details">
       <div class="username">
         {{ user?.userName || '未知用户' }}
@@ -23,7 +18,6 @@
     <el-button
       v-if="showFollowButton && user?.id"
       :type="user.followed ? 'default' : 'primary'"
-      :size="buttonSize"
       @click="handleFollow"
     >
     </el-button>

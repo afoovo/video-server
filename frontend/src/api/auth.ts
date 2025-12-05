@@ -3,7 +3,7 @@
  * 适配sa-token认证机制
  */
 import request from '@/utils/request';
-import type { LoginForm, RegisterForm, User, AuthResponse } from '@/types/user';
+import type { AuthResponse, LoginForm, RegisterForm, User } from '@/types/user';
 
 /**
  * 用户登录
@@ -27,7 +27,7 @@ export function register(data: RegisterForm): Promise<AuthResponse> {
   return request({
     url: '/auth/register',
     method: 'post',
-    data,
+    data: data,
   });
 }
 

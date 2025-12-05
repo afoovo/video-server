@@ -19,16 +19,16 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" :loading="loading" @click="handleSubmit"> 登录 </el-button>
-        <el-button @click="$router.push('/register')"> 注册账号 </el-button>
+        <el-button type="primary" :loading="loading" @click="handleSubmit">登录</el-button>
+        <el-button @click="$router.push('/register')">注册账号</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
+  import { onMounted, ref } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
   import { useUserStore } from '@/stores/user';
   import { ElMessage } from 'element-plus';
 
@@ -100,7 +100,7 @@
 
         ElMessage.success('登录成功');
         const redirect = route.query.redirect || '/';
-        router.push(redirect);
+        await router.push(redirect);
       }
     } catch (error) {
       console.error('登录失败:', error);
@@ -116,6 +116,4 @@
   });
 </script>
 
-<style lang="scss" scoped>
-  // 移除所有样式，因为已经移到全局样式中
-</style>
+<style lang="scss" scoped></style>

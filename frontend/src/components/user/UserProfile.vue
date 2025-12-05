@@ -1,3 +1,4 @@
+<!--个人中心-->
 <template>
   <div v-loading="loading" class="user-profile">
     <div v-if="userInfo" class="profile-header">

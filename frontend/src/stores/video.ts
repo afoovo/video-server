@@ -1,15 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import {
-  getVideos,
   getAllVideos,
-  getVideoDetail,
   getUserVideos,
+  getVideoDetail,
+  getVideos,
+  searchVideos,
   uploadVideoLocally,
   uploadVideoToCloud,
-  searchVideos,
 } from '@/api/video';
-import { useUserStore } from '@/stores/user';
 import type { Video, VideoDetail } from '@/types/video';
 
 export const useVideoStore = defineStore('video', () => {
@@ -17,7 +16,7 @@ export const useVideoStore = defineStore('video', () => {
   const currentVideo = ref<VideoDetail | null>(null);
   const loading = ref<boolean>(false);
   const total = ref<number>(0);
-  
+
   // 搜索相关状态
   const searchResults = ref<Video[]>([]);
   const searchLoading = ref<boolean>(false);
