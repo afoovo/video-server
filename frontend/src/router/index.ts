@@ -5,10 +5,10 @@
 import {
   createRouter,
   createWebHistory,
-  type RouteRecordRaw,
-  type Router,
-  type RouteLocationNormalized,
   type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type Router,
+  type RouteRecordRaw,
 } from 'vue-router';
 
 // 扩展路由元数据接口
@@ -108,6 +108,15 @@ const routes: RouteRecordRaw[] = [
       title: '个人中心',
       requiresAuth: true,
       keepAlive: true,
+    },
+  },
+  {
+    path: '/profile/completion',
+    name: 'UserInfoCompletion',
+    component: () => import('@/components/user/UserInfoCompletion.vue').then(m => m.default || m),
+    meta: {
+      title: '编辑个人信息',
+      requiresAuth: true,
     },
   },
 

@@ -18,6 +18,7 @@ export interface User {
   createTime: string;
   updateTime: string;
   avatarUrl?: string;
+  bio?: string;
 }
 
 /**
@@ -35,6 +36,8 @@ export interface LoginForm {
 export interface RegisterForm {
   account: string;
   password: string;
+  userName: string;
+  email: string;
 }
 
 /**
@@ -51,6 +54,7 @@ export interface UserProfile {
   status: number;
   createTime: string;
   updateTime: string;
+  bio?: string;
 }
 
 /**
