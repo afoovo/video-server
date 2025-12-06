@@ -1,29 +1,5 @@
 <template>
   <div class="video-list">
-    <div class="filter-bar">
-      <el-input
-        v-model="keyword"
-        placeholder="搜索视频"
-        prefix-icon="el-icon-search"
-        style="width: 300px"
-        @keyup.enter="handleSearch"
-      />
-      <el-button type="primary" @click="handleSearch"> 搜索 </el-button>
-      <el-button type="success" @click="handleCreate"> 上传视频 </el-button>
-      <div class="filter-group">
-        <span>分类:</span>
-        <el-select v-model="categoryId" placeholder="选择分类" @change="handleSearch">
-          <el-option label="全部" value="" />
-          <el-option
-            v-for="category in categories"
-            :key="category.id"
-            :label="category.name"
-            :value="category.id"
-          />
-        </el-select>
-      </div>
-    </div>
-
     <div v-loading="loading" class="video-grid">
       <div v-for="video in videos" :key="video.id" class="video-item">
         <video-card :video="video" @click="handleVideoClick(video)" />
@@ -47,28 +23,25 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
+  import { computed, onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { ElMessage } from 'element-plus';
   import VideoCard from './VideoCard.vue';
-  import { getVideos } from '@/api/video';
+  import { getUserVideos, getVideos } from '@/api/video';
   import type { Video } from '@/types/video';
 
   const router = useRouter();
+  const props = defineProps({
+    userId: {
+      type: [String, Number],
+      default: null,
+    },
+    url: {
+      type: String,
+      default: null,
+    },
+  });
 
-  // mock分类数据
-  const categories = [
-    { id: '', name: '全部' },
-    { id: 'gaming', name: '游戏' },
-    { id: 'music', name: '音乐' },
-    { id: 'movie', name: '电影' },
-    { id: 'anime', name: '动漫' },
-    { id: 'tech', name: '科技' },
-    { id: 'sports', name: '体育' },
-    { id: 'food', name: '美食' },
-  ];
-
-  // 状态管理
   const loading = ref(false);
   const videos = ref<Video[]>([]);
   const total = ref(0);
@@ -79,22 +52,43 @@
   const keyword = ref('');
   const categoryId = ref('');
 
-  // 计算属性
   const showPagination = computed(() => total.value > pageSize.value);
   const emptyText = computed(() =>
     keyword.value || categoryId.value ? '没有找到符合条件的视频' : '暂无视频数据'
   );
 
-  // 方法
   const fetchVideos = async () => {
     loading.value = true;
     try {
-      const response = await getVideos({
-        pageNum: currentPage.value,
-        pageSize: pageSize.value,
-      });
-      videos.value = response.records || [];
-      total.value = response.total || 0;
+      let response;
+
+      // 如果有 userId，获取用户视频
+      if (props.userId) {
+        response = await getUserVideos(props.userId);
+        // 将用户视频列表转换为标准格式
+        videos.value = response || [];
+        total.value = response ? response.length : 0;
+      }
+      // 如果有自定义URL，使用该URL
+      else if (props.url) {
+        // 这里可以扩展为使用自定义URL获取视频
+        // 目前使用默认API
+        response = await getVideos({
+          pageNum: currentPage.value,
+          pageSize: pageSize.value,
+        });
+        videos.value = response.records || [];
+        total.value = response.total || 0;
+      }
+      // 默认获取所有视频
+      else {
+        response = await getVideos({
+          pageNum: currentPage.value,
+          pageSize: pageSize.value,
+        });
+        videos.value = response.records || [];
+        total.value = response.total || 0;
+      }
     } catch {
       ElMessage.error('获取视频列表失败');
     } finally {
@@ -102,26 +96,8 @@
     }
   };
 
-  const handleSearch = () => {
-    if (keyword.value.trim()) {
-      // 如果有搜索关键词，跳转到搜索结果页
-      router.push({
-        name: 'search',
-        query: { q: keyword.value.trim() }
-      });
-    } else {
-      // 如果搜索框为空，重置当前页面
-      currentPage.value = 1;
-      fetchVideos();
-    }
-  };
-
   const handleVideoClick = (video: Video) => {
     router.push(`/video/${video.id}`);
-  };
-
-  const handleCreate = () => {
-    router.push('/video/upload');
   };
 
   const handleSizeChange = () => {
@@ -133,6 +109,13 @@
     fetchVideos();
   };
 
+  // 暴露方法给父组件
+  defineExpose({
+    fetchVideos,
+    // 也可以暴露其他方法，如果需要的话
+    loadVideos: fetchVideos, // 为了兼容性，提供一个别名
+  });
+
   // 生命周期
   onMounted(() => {
     fetchVideos();
@@ -142,23 +125,6 @@
 <style scoped>
   .video-list {
     padding: 20px;
-  }
-
-  .filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-    padding: 16px;
-    background-color: #f5f7fa;
-    border-radius: 8px;
-  }
-
-  .filter-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto;
   }
 
   .filter-group span {
@@ -187,15 +153,6 @@
   }
 
   @media (max-width: 768px) {
-    .filter-bar {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .filter-group {
-      margin-left: 0;
-    }
-
     .video-grid {
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     }
