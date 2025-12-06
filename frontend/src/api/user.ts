@@ -1,6 +1,5 @@
 import request from '@/utils/request';
 import type { User } from '@/types/user';
-import type { ApiResponse } from '@/types/common';
 
 /**
  * 获取用户信息
@@ -9,7 +8,7 @@ import type { ApiResponse } from '@/types/common';
  */
 export function getUserInfo(id: number | string): Promise<User> {
   return request({
-    url: `/users/${id}`,
+    url: `/user/get/${id}`,
     method: 'get',
   });
 }
@@ -22,24 +21,11 @@ export function getUserInfo(id: number | string): Promise<User> {
  */
 export function updateUser(id: number | string, data: Partial<User>): Promise<User> {
   return request({
-    url: `/users/${id}`,
+    url: `/user/update`,
     method: 'put',
-    data,
-  });
-}
-
-/**
- * 更新用户状态
- * @param {number|string} id - 用户ID
- * @param {number} status - 状态
- * @returns {Promise<ApiResponse<void>>} 操作结果
- */
-export function updateUserStatus(id: number | string, status: number): Promise<ApiResponse<void>> {
-  return request({
-    url: `/users/${id}/status`,
-    method: 'put',
-    params: {
-      status,
+    data: {
+      id,
+      ...data,
     },
   });
 }
