@@ -22,16 +22,14 @@ public class SaTokenConfigure {
         return new SaTokenInterceptor()
 
                 // 指定 [拦截路由] 与 [放行路由]
-                // .addInclude("/**").addExclude("/favicon.ico", "/error", "/auth/register", "/auth/login") 
-                .addInclude("/**").addExclude("/favicon.ico", "/error", "/auth/register", "/auth/login", "/file/**", "/video/**", "/user/search/**")
-
+                .addInclude("/**").addExclude("/favicon.ico", "/error", "/auth/register", "/auth/login")
                 // 认证函数: 每次请求执行
                 .setAuth(r -> {
                     // 登录认证
                     SaRouter.match("/**", StpUtil::checkLogin);
 
                     // 权限认证
-                    SaRouter.match("/admin/**", () -> StpUtil.checkRole("admin"));
+//                    SaRouter.match("/admin/**", () -> StpUtil.checkRole("admin"));
                 })
 
                 // 异常处理函数：每次认证函数发生异常时执行此函数

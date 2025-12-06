@@ -57,6 +57,11 @@ service.interceptors.request.use(
       config.headers.set('Authorization', `Bearer ${token}`);
     }
 
+    // 为所有请求添加satoken头（sa-token框架需要）
+    if (!config.headers.has('satoken')) {
+      config.headers.set('satoken', token || '');
+    }
+
     // 处理上传文件时的Content-Type
     if (config.headers.get('Content-Type') === 'multipart/form-data') {
       config.headers.delete('Content-Type');
