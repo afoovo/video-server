@@ -25,4 +25,7 @@ public class User extends BaseEntity {
 
     private Integer status;
     private String salt;
+    @Column("avatar_url")
+    private String avatarUrl;
+    private String bio;
 }

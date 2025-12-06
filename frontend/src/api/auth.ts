@@ -11,10 +11,18 @@ import type { AuthResponse, LoginForm, RegisterForm, User } from '@/types/user';
  * @returns 认证响应，包含token和用户信息
  */
 export function login(data: LoginForm): Promise<AuthResponse> {
+  // 使用URLSearchParams以表单格式提交数据
+  const formData = new URLSearchParams();
+  formData.append('account', data.account);
+  formData.append('password', data.password);
+
   return request({
     url: '/auth/login',
     method: 'post',
-    params: data,
+    data: formData,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
   });
 }
 
