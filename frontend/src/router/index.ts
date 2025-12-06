@@ -110,15 +110,6 @@ const routes: RouteRecordRaw[] = [
       keepAlive: true,
     },
   },
-  {
-    path: '/profile/completion',
-    name: 'UserInfoCompletion',
-    component: () => import('@/components/user/UserInfoCompletion.vue').then(m => m.default || m),
-    meta: {
-      title: '编辑个人信息',
-      requiresAuth: true,
-    },
-  },
 
   // 信息页面路由
   {

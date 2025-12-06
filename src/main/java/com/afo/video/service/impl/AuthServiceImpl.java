@@ -81,11 +81,6 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
             return AjaxJson.getError("账号已存在");
         }
 
-//        // 密码强度校验
-//        if (password.length() < 8) {
-//            return AjaxJson.getError("密码长度不能少于8位");
-//        }
-
         // 创建新用户
         User newUser = new User();
         newUser.setId(CloudClient.id().generate());// 使用Solon-Cloud生成ID(默认实现为Snowflake)

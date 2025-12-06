@@ -1,6 +1,5 @@
 import request from '@/utils/request';
-import type { Video, VideoListResponse, VideoDetail } from '@/types/video';
-import type { PaginatedResponse } from '@/types/common';
+import type { Video, VideoDetail, VideoListResponse } from '@/types/video';
 
 /**
  * 获取视频列表
