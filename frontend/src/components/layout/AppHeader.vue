@@ -40,8 +40,8 @@
         </template>
 
         <template v-else>
-          <el-button link aria-label="登录" @click="$router.push('/login')"> 登录 </el-button>
-          <el-button type="primary" aria-label="注册" @click="$router.push('/register')">
+          <el-button link aria-label="登录" @click="router.push('/login')"> 登录 </el-button>
+          <el-button type="primary" aria-label="注册" @click="router.push('/register')">
             注册
           </el-button>
         </template>
@@ -52,7 +52,7 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue';
-  import { useRouter, useRoute, createRouter as $router } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import { Search, Plus } from '@element-plus/icons-vue';
   import { useUserStore } from '@/stores/user';
   import { ElMessage } from 'element-plus';
@@ -108,7 +108,7 @@
   const handleLogout = async () => {
     try {
       await userStore.logout();
-      await router.push('/login');
+      await router.push('/');
     } catch (error) {
       console.error('退出失败:', error);
       ElMessage.error('退出失败，请重试');

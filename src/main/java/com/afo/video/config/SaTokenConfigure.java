@@ -22,7 +22,7 @@ public class SaTokenConfigure {
         return new SaTokenInterceptor()
 
                 // 指定 [拦截路由] 与 [放行路由]
-                .addInclude("/**").addExclude("/favicon.ico", "/error", "/auth/**")
+                .addInclude("/**").addExclude("/favicon.ico", "/error", "/auth/**","/video/**")
 
                 // 认证函数: 每次请求执行
                 .setAuth(r -> {

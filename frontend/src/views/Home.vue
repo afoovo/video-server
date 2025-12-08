@@ -11,7 +11,9 @@
             :class="{ active: activeCategory === category.id }"
             @click="handleCategoryChange(category.id)"
           >
-            <el-icon><component :is="category.icon" /></el-icon>
+            <el-icon>
+              <component :is="category.icon" />
+            </el-icon>
             <span>{{ category.name }}</span>
           </div>
         </div>
@@ -25,8 +27,8 @@
           </div>
           <div class="right">
             <el-radio-group v-model="sortBy" size="small" @change="handleSortChange">
-              <el-radio-button value="latest"> 最新发布 </el-radio-button>
-              <el-radio-button value="popular"> 最多播放 </el-radio-button>
+              <el-radio-button value="latest"> 最新发布</el-radio-button>
+              <el-radio-button value="popular"> 最多播放</el-radio-button>
             </el-radio-group>
           </div>
         </div>
@@ -58,7 +60,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { ElMessage } from 'element-plus';
   import { getVideos } from '@/api/video';
@@ -96,6 +98,9 @@
   };
 
   const loadVideos = async () => {
+    // 防止重复请求
+    if (loading.value) return;
+
     loading.value = true;
     try {
       const params = {
@@ -121,7 +126,12 @@
       const res = await getVideos(params);
       console.log('获取到视频数据:', res);
 
-      if (Array.isArray(res)) {
+      if (res && typeof res === 'object' && Array.isArray(res.records)) {
+        // 处理分页响应格式
+        videos.value = res.records;
+        total.value = res.total || 0;
+      } else if (Array.isArray(res)) {
+        // 处理数组响应格式
         videos.value = res;
         total.value = res.length || 0;
       } else {
@@ -153,6 +163,7 @@
 
   const handleSizeChange = val => {
     pageSize.value = val;
+    currentPage.value = 1; // 重置到第一页
     loadVideos();
   };
 
@@ -169,7 +180,4 @@
     loadVideos();
   });
 </script>
-
-<style lang="scss" scoped>
-  // 移除所有样式，因为已经移到全局样式中
-</style>
+<style lang="scss" scoped></style>

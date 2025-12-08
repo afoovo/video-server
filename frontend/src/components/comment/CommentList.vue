@@ -22,7 +22,7 @@
       </el-button>
     </div>
     <div v-else class="login-tip">
-      <el-link type="primary" @click="$router.push('/login')">登录</el-link>
+      <el-link type="primary" @click="router.push('/login')">登录</el-link>
       后发表评论
     </div>
 

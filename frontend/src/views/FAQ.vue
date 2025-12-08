@@ -91,7 +91,7 @@
 
       <div class="contact-section">
         <p>如果您的问题未在以上常见问题中找到答案，请随时联系我们的客服团队。</p>
-        <el-button type="primary" @click="$router.push('/contact')"> 联系我们 </el-button>
+        <el-button type="primary" @click="router.push('/contact')"> 联系我们 </el-button>
       </div>
     </div>
   </div>
@@ -99,6 +99,7 @@
 
 <script setup>
   import { ref, onMounted } from 'vue';
+  import router from '@/router/index.js';
 
   const activeNames = ref(['1']);
 
