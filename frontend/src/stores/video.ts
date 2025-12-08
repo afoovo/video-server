@@ -57,7 +57,7 @@ export const useVideoStore = defineStore('video', () => {
   }
 
   // 获取视频详情
-  async function fetchVideoDetail(id: number | string): Promise<VideoDetail> {
+  async function fetchVideoDetail(id: string): Promise<VideoDetail> {
     try {
       loading.value = true;
       const data = await getVideoDetail(id);
@@ -72,7 +72,7 @@ export const useVideoStore = defineStore('video', () => {
   }
 
   // 获取用户视频列表
-  async function fetchUserVideos(userId: number | string): Promise<void> {
+  async function fetchUserVideos(userId: string): Promise<void> {
     try {
       loading.value = true;
       const data = await getUserVideos(userId);
@@ -146,7 +146,7 @@ export const useVideoStore = defineStore('video', () => {
     title: string;
     coverUrl: string;
     playCount: number;
-    userId: number | string;
+    userId: string;
     viewTime: string;
   }
 

@@ -1,7 +1,7 @@
 // 视频类型定义
 
 export interface Video {
-  id: number;
+  id: string;
   title: string;
   description: string;
   coverUrl: string;
@@ -10,7 +10,7 @@ export interface Video {
   status: number;
   createTime: string;
   updateTime: string;
-  userId: number;
+  userId: string;
   categoryId: number;
   // 统计字段（可能由其他服务计算）
   playCount?: number;

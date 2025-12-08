@@ -33,7 +33,7 @@
   const router = useRouter();
   const props = defineProps({
     userId: {
-      type: [String, Number],
+      type: [String],
       default: null,
     },
     url: {

@@ -39,7 +39,7 @@ export const useCategoryStore = defineStore('category', () => {
    * 获取分类详情
    * @param {number|string} id - 分类ID
    */
-  async function fetchCategoryDetail(id: number | string): Promise<void> {
+  async function fetchCategoryDetail(id: number): Promise<void> {
     try {
       loading.value = true;
       currentCategory.value = await getCategoryDetail(id);
@@ -55,7 +55,7 @@ export const useCategoryStore = defineStore('category', () => {
    * 获取分类视频列表
    * @param {number|string} id - 分类ID
    */
-  async function fetchCategoryVideos(id: number | string): Promise<void> {
+  async function fetchCategoryVideos(id: number): Promise<void> {
     try {
       loading.value = true;
       const data = await getCategoryVideos(id);

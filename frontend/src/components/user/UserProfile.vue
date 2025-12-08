@@ -2,7 +2,57 @@
 <template>
   <div v-loading="loading" class="user-profile">
     <div v-if="userInfo" class="profile-header">
-      <user-info-display :user="userInfo" :detailed="true" :size="100" />
+      <div class="avatar-container">
+        <el-avatar :size="100" :src="avatarUrl" class="user-avatar" />
+        <el-upload
+          v-if="isViewingSelf"
+          :before-upload="beforeAvatarUpload"
+          :headers="uploadHeaders"
+          :on-success="handleAvatarSuccess"
+          :show-file-list="false"
+          action="/api/file/uploadLocally"
+          class="avatar-uploader"
+        >
+          <el-button class="upload-btn" size="small" type="primary">更换头像</el-button>
+        </el-upload>
+      </div>
+      <div class="user-info">
+        <div class="username">{{ userInfo.userName || '未知用户' }}</div>
+        <div class="bio-container">
+          <div v-if="!isEditingBio" class="bio">
+            {{ userInfo.bio || '这个人很懒，什么都没写~' }}
+          </div>
+          <div v-else class="bio-edit">
+            <el-input
+              v-model="bioText"
+              :rows="3"
+              maxlength="200"
+              placeholder="介绍一下你自己..."
+              show-word-limit
+              type="textarea"
+            />
+            <div class="bio-actions">
+              <el-button size="small" @click="cancelEditBio">取消</el-button>
+              <el-button size="small" type="primary" @click="saveBio">保存</el-button>
+            </div>
+          </div>
+          <el-button
+            v-if="isViewingSelf && !isEditingBio"
+            class="edit-bio-btn"
+            size="small"
+            type="text"
+            @click="startEditBio"
+          >
+            编辑简介
+          </el-button>
+        </div>
+        <div class="stats">
+          <div class="stat-item">
+            <span class="count">{{ userInfo.videoCount || 0 }}</span>
+            <span class="label">视频</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <el-empty v-else-if="!loading" description="无法加载用户信息" />
@@ -10,10 +60,11 @@
     <div v-if="userInfo" class="profile-content">
       <el-tabs v-model="activeTab">
         <el-tab-pane label="视频" name="videos">
-          <video-list v-if="activeTab === 'videos'" ref="videoListRef" :user-id="userInfo.id" />
-        </el-tab-pane>
-        <el-tab-pane label="喜欢" name="likes">
-          <video-list v-if="activeTab === 'likes'" url="/likes/user/videos" />
+          <video-list
+            v-if="activeTab === 'videos'"
+            ref="videoListRef"
+            :user-id="typeof userInfo.id === 'object' ? userInfo.id?.id : userInfo.id"
+          />
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -21,13 +72,12 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, computed, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useUserStore } from '@/stores/user';
   import { useRoute, useRouter } from 'vue-router';
   import VideoList from '@/components/video/VideoList.vue';
-  import UserInfoDisplay from '@/components/common/UserInfoDisplay.vue';
   import { ElMessage } from 'element-plus';
-  import { getUserInfo } from '@/api/user';
+  import { getUserInfo, updateUser } from '@/api/user';
 
   const userStore = useUserStore();
   const route = useRoute();
@@ -36,20 +86,26 @@
   const activeTab = ref('videos');
   const loading = ref(true);
   const videoListRef = ref();
+  const isEditingBio = ref(false);
+  const bioText = ref('');
+  // 定义上传头像时的请求头
+  const uploadHeaders = computed(() => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  });
+  // 计算头像URL
+  const avatarUrl = computed(() => {
+    if (!userInfo.value?.avatar) {
+      return new URL('@/assets/default-avatar.png', import.meta.url).href;
+    }
+    return `/api${userInfo.value.avatar}`;
+  });
 
   // 从路由参数获取用户ID，或者使用当前登录用户的ID
-  const userId = computed(() => route.params.id || userStore.userId);
+  const userId = computed(() => userStore.userId);
 
   // 是否查看自己的个人资料
   const isViewingSelf = computed(() => !route.params.id && userStore.isLoggedIn);
-
-  const refreshVideoList = () => {
-    console.log('尝试刷新视频列表');
-    if (videoListRef.value) {
-      console.log('刷新视频列表');
-      videoListRef.value.loadVideos();
-    }
-  };
 
   const loadUserInfo = async () => {
     loading.value = true; // 确保在开始时设置loading状态
@@ -80,7 +136,7 @@
       const res = await getUserInfo(userId.value);
       console.log('获取到用户信息:', res);
 
-      if (res && (res.id || res.userId)) {
+      if (res && res.id) {
         userInfo.value = res;
         // 如果是自己的资料，同时更新store
         if (isViewingSelf.value) {
@@ -108,18 +164,92 @@
   );
 
   // 当userInfo变化时，刷新视频列表
-  watch(userInfo, newValue => {
-    if (newValue) {
-      console.log('用户信息已加载，刷新视频列表');
-      setTimeout(() => {
-        refreshVideoList();
-      }, 100);
+  watch(userInfo, () => {});
+
+  // 处理头像上传成功
+  const handleAvatarSuccess = response => {
+    if (response && response.data) {
+      // 更新用户信息
+      userInfo.value.avatar = response.data;
+
+      // 如果是查看自己的资料，同时更新store和本地存储
+      if (isViewingSelf.value) {
+        userStore.userInfo.avatar = response.data;
+        localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo));
+      }
+
+      ElMessage.success('头像更新成功');
+    } else {
+      ElMessage.error('头像上传失败');
     }
-  });
+  };
 
-  onMounted(async () => {
-    loading.value = true; // 确保在挂载时设置loading状态
+  // 上传前验证
+  const beforeAvatarUpload = file => {
+    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+    const isLt2M = file.size / 1024 / 1024 < 2;
 
+    if (!isJPG) {
+      ElMessage.error('上传头像图片只能是 JPG/PNG 格式!');
+    }
+    if (!isLt2M) {
+      ElMessage.error('上传头像图片大小不能超过 2MB!');
+    }
+
+    return isJPG && isLt2M;
+  };
+
+  // 开始编辑个人介绍
+  const startEditBio = () => {
+    isEditingBio.value = true;
+    bioText.value = userInfo.value.bio || '';
+  };
+
+  // 取消编辑个人介绍
+  const cancelEditBio = () => {
+    isEditingBio.value = false;
+    bioText.value = '';
+  };
+
+  // 保存个人介绍
+  const saveBio = async () => {
+    try {
+      loading.value = true;
+
+      const userId = userInfo.value.id;
+      const updatedUser = await updateUser(userId, { bio: bioText.value });
+
+      if (updatedUser) {
+        userInfo.value.bio = updatedUser.bio;
+
+        // 如果是查看自己的资料，使用refreshUserInfo更新整个用户信息
+        if (isViewingSelf.value) {
+          try {
+            await userStore.refreshUserInfo();
+            // 更新本地userInfo引用
+            userInfo.value = userStore.userInfo;
+          } catch (refreshError) {
+            console.error('刷新用户信息失败:', refreshError);
+            // 降级处理：只更新bio字段
+            userStore.userInfo.bio = updatedUser.bio;
+            localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo));
+          }
+        }
+
+        ElMessage.success('个人介绍更新成功');
+        isEditingBio.value = false;
+      }
+    } catch (error) {
+      console.error('更新个人介绍失败:', error);
+      ElMessage.error('更新个人介绍失败');
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 使用立即执行的异步函数代替onMounted中的async
+  const initProfile = async () => {
+    loading.value = true;
     try {
       // 确保userStore已初始化
       if (!userStore.isLoggedIn) {
@@ -129,21 +259,130 @@
           console.error('初始化用户状态失败:', error);
         }
       }
-
       await loadUserInfo();
-
-      // 加载完用户信息后刷新视频列表
-      setTimeout(() => {
-        refreshVideoList();
-      }, 100);
     } catch (error) {
       console.error('加载用户信息失败:', error);
     } finally {
-      loading.value = false; // 确保在所有情况下都结束loading状态
+      loading.value = false;
     }
+  };
+
+  onMounted(() => {
+    initProfile();
   });
 </script>
 
 <style lang="scss" scoped>
-  // 移除所有样式，因为已经移到全局样式中
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+    gap: 1.5rem;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+  }
+
+  .avatar-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .user-avatar {
+    border: 3px solid #f0f0f0;
+  }
+
+  .upload-btn {
+    font-size: 0.8rem;
+  }
+
+  .user-info {
+    flex: 1;
+    width: 100%;
+
+    .username {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      text-align: center;
+
+      @media (min-width: 768px) {
+        text-align: left;
+      }
+    }
+
+    .bio-container {
+      margin-bottom: 1rem;
+      position: relative;
+
+      .bio {
+        color: #666;
+        margin-bottom: 0.5rem;
+        text-align: center;
+
+        @media (min-width: 768px) {
+          text-align: left;
+        }
+      }
+
+      .bio-edit {
+        margin-bottom: 0.5rem;
+
+        .bio-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+        }
+      }
+
+      .edit-bio-btn {
+        font-size: 0.8rem;
+        padding: 0;
+        height: auto;
+        color: #409eff;
+
+        &:hover {
+          color: #66b1ff;
+        }
+      }
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+
+      @media (min-width: 768px) {
+        justify-content: flex-start;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        @media (min-width: 768px) {
+          align-items: flex-start;
+        }
+
+        .count {
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+
+        .label {
+          color: #666;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
 </style>

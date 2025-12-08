@@ -3,10 +3,10 @@ import type { User } from '@/types/user';
 
 /**
  * 获取用户信息
- * @param {number|string} id - 用户ID
+ * @param {string} id - 用户ID
  * @returns {Promise<User>} 用户信息
  */
-export function getUserInfo(id: number | string): Promise<User> {
+export function getUserInfo(id: string): Promise<User> {
   return request({
     url: `/user/get/${id}`,
     method: 'get',
@@ -15,11 +15,11 @@ export function getUserInfo(id: number | string): Promise<User> {
 
 /**
  * 更新用户信息
- * @param {number|string} id - 用户ID
+ * @param {string} id - 用户ID
  * @param {Partial<User>} data - 用户信息更新数据
  * @returns {Promise<User>} 更新后的用户信息
  */
-export function updateUser(id: number | string, data: Partial<User>): Promise<User> {
+export function updateUser(id: string, data: Partial<User>): Promise<User> {
   return request({
     url: `/user/update`,
     method: 'put',

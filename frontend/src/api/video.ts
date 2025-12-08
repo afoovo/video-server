@@ -37,10 +37,10 @@ export function getAllVideos(): Promise<Video[]> {
 
 /**
  * 获取视频详情
- * @param {number|string} id - 视频ID
+ * @param {string} id - 视频ID
  * @returns {Promise<VideoDetail>}
  */
-export function getVideoDetail(id: number | string): Promise<VideoDetail> {
+export function getVideoDetail(id: string): Promise<VideoDetail> {
   return request({
     url: `/video/${id}`,
     method: 'get',
@@ -106,10 +106,10 @@ export function uploadVideoToCloud(
 
 /**
  * 获取用户视频列表
- * @param {number|string} userId - 用户ID
+ * @param {string} userId - 用户ID
  * @returns {Promise<Video[]>}
  */
-export function getUserVideos(userId: number | string): Promise<Video[]> {
+export function getUserVideos(userId: string): Promise<Video[]> {
   // 参数验证
   if (!userId) {
     return Promise.reject(new Error('userId不能为空'));
@@ -135,9 +135,9 @@ export function searchVideos(keyword: string): Promise<Video[]> {
 
 /**
  * 获取视频播放URL
- * @param {number|string} id - 视频ID
+ * @param {string} id - 视频ID
  * @returns {string} 视频播放URL
  */
-export function getVideoPlayUrl(id: number | string): string {
+export function getVideoPlayUrl(id: string): string {
   return `/video/play/${id}`;
 }

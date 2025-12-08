@@ -10,8 +10,9 @@ import axios, {
 import { ElMessage } from 'element-plus';
 import router from '@/router';
 import type { ApiResponse } from '@/types/common';
+import JSONbig from 'json-bigint';
 
-// 创建 axios 实例
+// 创建 axios 实例，添加处理大整数
 const service: AxiosInstance = axios.create({
   baseURL: '/api',
   timeout: 15000,
@@ -19,6 +20,19 @@ const service: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  transformResponse: [
+    function (data) {
+      if (typeof data === 'string' && data.length) {
+        try {
+          return JSONbig.parse(data);
+        } catch (err) {
+          console.error('JSON big int parse error:', err);
+          return data;
+        }
+      }
+      return data;
+    },
+  ],
 });
 
 // 判断是否是认证相关的URL

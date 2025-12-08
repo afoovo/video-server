@@ -56,7 +56,7 @@
   // 为VideoCard定义独立的Props接口，避免与Video接口冲突
   interface VideoCardProps {
     video: {
-      id: string | number;
+      id: string;
       title: string;
       coverUrl?: string;
       duration: number;

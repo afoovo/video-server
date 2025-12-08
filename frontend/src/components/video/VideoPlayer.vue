@@ -14,7 +14,7 @@
     url: string;
     poster?: string;
     title?: string;
-    videoId: string | number;
+    videoId: string;
   }>();
 
   const emit = defineEmits<{

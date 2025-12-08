@@ -8,7 +8,7 @@
  * 对应后端返回的用户信息结构
  */
 export interface User {
-  id: number;
+  id: string;
   userName: string;
   account: string;
   email: string;
@@ -38,23 +38,6 @@ export interface RegisterForm {
   password: string;
   userName: string;
   email: string;
-}
-
-/**
- * 用户资料接口
- */
-export interface UserProfile {
-  id: number;
-  userName: string;
-  account: string;
-  email: string;
-  avatarUrl?: string;
-  sex?: string;
-  roleId: number;
-  status: number;
-  createTime: string;
-  updateTime: string;
-  bio?: string;
 }
 
 /**

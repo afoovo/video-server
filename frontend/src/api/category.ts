@@ -32,7 +32,7 @@ export function getCategories(): Promise<Category[]> {
  * @param {number|string} id - 分类ID
  * @returns {Promise<Category>}
  */
-export function getCategoryDetail(id: number | string): Promise<Category> {
+export function getCategoryDetail(id: number): Promise<Category> {
   return request({
     url: `/category/${id}`,
     method: 'get',
@@ -44,7 +44,7 @@ export function getCategoryDetail(id: number | string): Promise<Category> {
  * @param {number|string} id - 分类ID
  * @returns {Promise<Video[]>}
  */
-export function getCategoryVideos(id: number | string): Promise<Video[]> {
+export function getCategoryVideos(id: number): Promise<Video[]> {
   return request({
     url: `/category/${id}/videoList`,
     method: 'get',

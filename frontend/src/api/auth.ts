@@ -68,7 +68,7 @@ export function checkToken(): Promise<{ valid: boolean }> {
  * 获取当前用户ID
  * @returns 用户ID或Promise.reject
  */
-export function getUserId(): string | number | Promise<never> {
+export function getUserId(): string | Promise<never> {
   try {
     const userInfoStr = localStorage.getItem('userInfo');
     if (!userInfoStr) {
