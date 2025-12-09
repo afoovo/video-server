@@ -36,7 +36,7 @@
             </h3>
             <div class="stats">
               <div class="uploader">
-                <el-avatar :size="20" :src="video.user?.avatar" />
+                <el-avatar :size="20" :src="video.user?.avatarUrl || '/default-avatar.png'" />
                 <span class="username">{{ video.user?.username }}</span>
               </div>
               <div class="counts">

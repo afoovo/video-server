@@ -83,7 +83,7 @@ public class FileServiceImpl implements FileService {
             file.transferTo(new File(videoFilePath));
 
             // 构建视频文件可访问路径
-            String videoFileUrl = "/uploads/" + folderName + "/" + newVideoFileName;
+            String videoFileUrl = "/static/uploads/" + folderName + "/" + newVideoFileName;
 
             // 处理封面文件
             String coverUrl;
@@ -98,7 +98,7 @@ public class FileServiceImpl implements FileService {
                     String newCoverFileName = baseCoverName + coverExt;
                     String coverFilePath = videoDir + File.separator + newCoverFileName;
                     cover.transferTo(new File(coverFilePath));
-                    coverUrl = "/uploads/" + folderName + "/" + newCoverFileName;
+                    coverUrl = "/static/uploads/" + folderName + "/" + newCoverFileName;
                 } else {
                     return AjaxResult.error("封面文件必须为图片类型");
                 }
@@ -269,8 +269,8 @@ public class FileServiceImpl implements FileService {
             String avatarFilePath = uploadPath + File.separator + newFileName;
             file.transferTo(new File(avatarFilePath));
 
-            // 构建头像文件可访问路径
-            String avatarUrl = "/uploads/avatar/" + newFileName;
+            // 构建头像文件可访问路径（使用/static前缀）
+            String avatarUrl = "/static/uploads/avatar/" + newFileName;
             // 更新用户表中的头像字段
             User user = new User();
             user.setId(userId); // 设置用户ID作为主键
