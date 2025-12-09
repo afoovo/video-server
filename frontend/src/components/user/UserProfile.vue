@@ -10,7 +10,7 @@
           :headers="uploadHeaders"
           :on-success="handleAvatarSuccess"
           :show-file-list="false"
-          action="/api/file/uploadLocally"
+          action="/api/user/uploadAvatar"
           class="avatar-uploader"
         >
           <el-button class="upload-btn" size="small" type="primary">更换头像</el-button>
@@ -95,10 +95,10 @@
   });
   // 计算头像URL
   const avatarUrl = computed(() => {
-    if (!userInfo.value?.avatar) {
+    if (!userInfo.value?.avatarUrl) {
       return new URL('@/assets/default-avatar.png', import.meta.url).href;
     }
-    return `/api${userInfo.value.avatar}`;
+    return `/api${userInfo.value.avatarUrl}`;
   });
 
   // 从路由参数获取用户ID，或者使用当前登录用户的ID
@@ -170,11 +170,11 @@
   const handleAvatarSuccess = response => {
     if (response && response.data) {
       // 更新用户信息
-      userInfo.value.avatar = response.data;
+      userInfo.value.avatarUrl = response.data.avatarUrl;
 
       // 如果是查看自己的资料，同时更新store和本地存储
       if (isViewingSelf.value) {
-        userStore.userInfo.avatar = response.data;
+        userStore.userInfo.avatarUrl = response.data.avatarUrl;
         localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo));
       }
 

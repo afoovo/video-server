@@ -1,12 +1,15 @@
 package com.afo.video.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.afo.video.common.api.AjaxResult;
 import com.afo.video.domain.User;
 import com.afo.video.domain.Video;
+import com.afo.video.service.FileService;
 import com.afo.video.service.UserService;
 import com.afo.video.service.VideoService;
 import com.mybatisflex.core.paginate.Page;
 import org.noear.solon.annotation.*;
+import org.noear.solon.core.handle.UploadedFile;
 import org.noear.solon.validation.annotation.Valid;
 
 import java.util.List;
@@ -22,6 +25,8 @@ public class UserController {
     private UserService userService;
     @Inject
     private VideoService videoService;
+    @Inject
+    private FileService fileService;
 
     /**
      * 查询所有用户
@@ -137,6 +142,23 @@ public class UserController {
             return AjaxResult.ok("用户删除成功");
         } else {
             return AjaxResult.error("用户删除失败");
+        }
+    }
+
+    /**
+     * 头像上传
+     *
+     * @param file 头像文件
+     * @return 上传结果
+     */
+    @Post
+    @Mapping("/uploadAvatar")
+    public Object uploadAvatar(@Param("file") UploadedFile file) {
+        try {
+            Long userId = StpUtil.getLoginIdAsLong();
+            return fileService.uploadAvatar(file, userId);
+        } catch (Exception e) {
+            return AjaxResult.error("头像上传失败：" + e.getMessage());
         }
     }
 }

@@ -41,3 +41,19 @@ export function searchUsers(keyword: string): Promise<User[]> {
     method: 'get',
   });
 }
+
+/**
+ * 上传用户头像
+ * @param {FormData} formData - 包含头像文件的表单数据
+ * @returns {Promise<{avatarUrl: string}>} 上传结果，包含头像URL
+ */
+export function uploadAvatar(formData: FormData): Promise<{avatarUrl: string}> {
+  return request({
+    url: '/user/uploadAvatar',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}
