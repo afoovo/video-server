@@ -36,7 +36,7 @@ public class SaTokenConfigure {
                 // 异常处理函数：每次认证函数发生异常时执行此函数
                 .setError(e -> {
                     if (e instanceof NotLoginException) {
-                        StpUtil.logout();
+//                        StpUtil.logout();
                         return AjaxJson.getError("未登录或token已过期");
                     } //else if (e instanceof NotRoleException) {
 //                        return AjaxJson.getError("无此角色权限");

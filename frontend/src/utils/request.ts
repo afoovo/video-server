@@ -4,13 +4,14 @@
  */
 import axios, {
   type AxiosInstance,
-  type InternalAxiosRequestConfig,
   type AxiosResponse,
+  type InternalAxiosRequestConfig,
 } from 'axios';
 import { ElMessage } from 'element-plus';
 import router from '@/router';
 import type { ApiResponse } from '@/types/common';
 import JSONbig from 'json-bigint';
+import { useUserStore } from '@/stores/user';
 
 // 创建 axios 实例，添加处理大整数
 const service: AxiosInstance = axios.create({
@@ -44,6 +45,11 @@ function isAuthRelatedUrl(url?: string): boolean {
 
 // 处理认证错误
 function handleAuthError(): void {
+  // 清除store中的状态
+  const userStore = useUserStore();
+  userStore.clearAuthState();
+
+  // 清除localStorage中的状态
   localStorage.removeItem('token');
   localStorage.removeItem('userInfo');
   router.push({
@@ -109,6 +115,17 @@ service.interceptors.response.use(
 
     // 处理统一的响应格式 (后端使用code=200表示成功)
     if ((res as ApiResponse<any>).code !== undefined) {
+      // 处理未认证状态 - 当返回特定错误消息时也清除用户信息
+      if (
+        (res as ApiResponse<any>).code === 500 &&
+        (res as ApiResponse<any>).msg === '未登录或token已过期' &&
+        !isAuthRelatedUrl(response.config.url)
+      ) {
+        ElMessage.error('登录已过期，请重新登录');
+        handleAuthError();
+        return Promise.reject(new Error('未登录或token已过期'));
+      }
+
       if ((res as ApiResponse<any>).code !== 200) {
         const errorMessage = (res as ApiResponse<any>).msg || '请求失败';
         ElMessage.error(errorMessage);
