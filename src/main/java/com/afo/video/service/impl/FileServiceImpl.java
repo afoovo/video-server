@@ -86,7 +86,7 @@ public class FileServiceImpl implements FileService {
             String videoFileUrl = "/static/uploads/" + folderName + "/" + newVideoFileName;
 
             // 处理封面文件
-            String coverUrl;
+            String coverUrl = null;
             if (cover != null && !cover.isEmpty()) {
                 // 检查封面文件类型是否为图片
                 String coverContentType = cover.getContentType();
@@ -102,9 +102,6 @@ public class FileServiceImpl implements FileService {
                 } else {
                     return AjaxResult.error("封面文件必须为图片类型");
                 }
-            } else {
-                // 如果没有上传封面，默认使用视频文件作为封面
-                coverUrl = videoFileUrl;
             }
 
             // 创建视频对象并保存到数据库
@@ -114,7 +111,7 @@ public class FileServiceImpl implements FileService {
             video.setTitle(title);
             video.setDescription(description);
             video.setFileUrl(videoFileUrl);
-            video.setCoverUrl(coverUrl);
+            video.setCoverUrl(coverUrl); // 可能为 null
             video.setDuration(0); // 时长待后续处理，后端使用javaCV依赖太多太大，可能交给前端
             video.setStatus(1); // 设置为已发布
             video.setCreateTime(new Date());

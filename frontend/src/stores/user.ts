@@ -3,15 +3,15 @@
  * 适配sa-token认证机制
  */
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
-import { login as loginApi, logout as logoutApi, getCurrentUser } from '@/api/auth';
+import { computed, ref } from 'vue';
+import { getCurrentUser, login as loginApi, logout as logoutApi } from '@/api/auth';
 import { ElMessage } from 'element-plus';
-import type { User, LoginForm, AuthResponse } from '@/types/user';
+import type { LoginForm, User } from '@/types/user';
 
 export const useUserStore = defineStore('user', () => {
   // 默认值
-  const DEFAULT_AVATAR = '@/assets/default-avatar.png';
+  const DEFAULT_AVATAR = new URL('@/assets/default-avatar.png', import.meta.url).href;
 
   /**
    * 安全地解析 localStorage 中的数据

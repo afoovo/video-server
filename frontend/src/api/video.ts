@@ -106,17 +106,17 @@ export function uploadVideoToCloud(
 
 /**
  * 获取用户视频列表
- * @param {string} userId - 用户ID
+ * @param {string} Id - 用户ID
  * @returns {Promise<Video[]>}
  */
-export function getUserVideos(userId: string): Promise<Video[]> {
+export function getUserVideos(Id: string): Promise<Video[]> {
   // 参数验证
-  if (!userId) {
+  if (!Id) {
     return Promise.reject(new Error('userId不能为空'));
   }
 
   return request({
-    url: `/user/${userId}/videoList`,
+    url: `/user/${Id}/videoList`,
     method: 'get',
   });
 }
@@ -141,3 +141,7 @@ export function searchVideos(keyword: string): Promise<Video[]> {
 export function getVideoPlayUrl(id: string): string {
   return `/video/play/${id}`;
 }
+
+/**
+ * 下载视频，需要添加 responseType: 'blob'
+ */
