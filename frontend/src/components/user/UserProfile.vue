@@ -10,7 +10,7 @@
           :headers="uploadHeaders"
           :on-success="handleAvatarSuccess"
           :show-file-list="false"
-          action="/api/user/uploadAvatar"
+          action="/user/uploadAvatar"
           class="avatar-uploader"
         >
           <el-button class="upload-btn" size="small" type="primary">更换头像</el-button>
@@ -98,7 +98,7 @@
     if (!userInfo.value?.avatarUrl) {
       return new URL('@/assets/default-avatar.png', import.meta.url).href;
     }
-    return `/api${userInfo.value.avatarUrl}`;
+    return `${userInfo.value.avatarUrl}`;
   });
 
   // 从路由参数获取用户ID，或者使用当前登录用户的ID

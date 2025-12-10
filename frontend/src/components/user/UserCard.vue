@@ -1,12 +1,7 @@
 <template>
   <div class="user-card" @click="handleClick">
     <div class="user-avatar">
-      <el-avatar
-        :alt="user?.userName || '未知用户'"
-        :size="avatarSize"
-        :src="avatarUrl"
-        @error="handleAvatarError"
-      />
+      <el-avatar :alt="user?.userName || '未知用户'" :src="avatarUrl" @error="handleAvatarError" />
     </div>
     <div class="user-info">
       <div class="user-name">{{ user?.userName || '未知用户' }}</div>
@@ -37,8 +32,7 @@
     if (!props.user?.avatarUrl) {
       return new URL('@/assets/default-avatar.png', import.meta.url).href;
     }
-    // 确保头像URL通过/api代理访问
-    return `/api${props.user.avatarUrl}`;
+    return `${props.user.avatarUrl}`;
   });
 
   // 处理卡片点击

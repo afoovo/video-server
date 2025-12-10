@@ -2,7 +2,7 @@
   <div class="video-card" @click="handleClick">
     <div class="video-cover">
       <img
-        :src="video.coverUrl ? `/api${video.coverUrl}` : defaultCover"
+        :src="video.coverUrl ? `${video.coverUrl}` : defaultCover"
         :alt="video.title"
         class="cover-image"
         @error="handleImageError"

@@ -1,47 +1,45 @@
 <template>
   <header class="app-header">
     <div class="header-content">
-      <router-link to="/" class="logo">
-        <img src="@/assets/logo.png" alt="Video Share Logo" />
+      <router-link class="logo" to="/">
+        <img alt="Video Share Logo" src="@/assets/logo.png" />
       </router-link>
 
       <div class="search-bar">
         <el-input v-model="searchQuery" placeholder="搜索视频..." @keyup.enter="handleSearch">
           <template #suffix>
-            <el-button link :icon="Search" aria-label="搜索" @click="handleSearch" />
+            <el-button :icon="Search" aria-label="搜索" link @click="handleSearch" />
           </template>
         </el-input>
       </div>
 
       <div class="user-actions">
         <template v-if="isLoggedIn">
-          <el-button type="primary" :icon="Plus" aria-label="上传视频" @click="handleUpload">
+          <el-button :icon="Plus" aria-label="上传视频" type="primary" @click="handleUpload">
             上传视频
           </el-button>
 
           <el-dropdown trigger="hover" @command="handleCommand">
             <div class="avatar-wrapper" @click="goToProfile">
               <el-avatar
-                :src="userAvatar"
                 :alt="username"
+                :src="userAvatar"
                 class="user-avatar"
                 @error="handleAvatarError"
-              >
-                {{ username.charAt(0).toUpperCase() }}
-              </el-avatar>
+              />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="profile"> 个人中心 </el-dropdown-item>
-                <el-dropdown-item command="logout"> 退出登录 </el-dropdown-item>
+                <el-dropdown-item command="profile"> 个人中心</el-dropdown-item>
+                <el-dropdown-item command="logout"> 退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </template>
 
         <template v-else>
-          <el-button link aria-label="登录" @click="router.push('/login')"> 登录 </el-button>
-          <el-button type="primary" aria-label="注册" @click="router.push('/register')">
+          <el-button aria-label="登录" link @click="router.push('/login')"> 登录</el-button>
+          <el-button aria-label="注册" type="primary" @click="router.push('/register')">
             注册
           </el-button>
         </template>
@@ -51,9 +49,9 @@
 </template>
 
 <script setup>
-  import { ref, computed, watch } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
-  import { Search, Plus } from '@element-plus/icons-vue';
+  import { computed, ref, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import { Plus, Search } from '@element-plus/icons-vue';
   import { useUserStore } from '@/stores/user';
   import { ElMessage } from 'element-plus';
 
@@ -65,7 +63,14 @@
   // 计算属性优化
   const isLoggedIn = computed(() => userStore.isLoggedIn);
   const username = computed(() => userStore.username);
-  const userAvatar = computed(() => userStore.avatar);
+  const userAvatar = computed(() => {
+    const avatarPath = userStore.avatar;
+    // 如果没有头像路径，使用默认头像
+    if (!avatarPath) {
+      return new URL('@/assets/default-avatar.png', import.meta.url).href;
+    }
+    return avatarPath;
+  });
 
   // 监听路由变化，当离开搜索页面时清空搜索框
   watch(

@@ -25,7 +25,7 @@
             {{ index + 1 }}
           </div>
           <div class="video-cover">
-            <img :src="`/api${video.coverUrl}`" :alt="video.title" />
+            <img :src="`${video.coverUrl}`" :alt="video.title" />
             <div class="video-duration">
               {{ formatDuration(video.duration) }}
             </div>
@@ -36,8 +36,7 @@
             </h3>
             <div class="stats">
               <div class="uploader">
-                <el-avatar :size="20" :src="video.user?.avatarUrl || '/default-avatar.png'" />
-                <span class="username">{{ video.user?.username }}</span>
+                <UserCard :user="video.user" :show-account="false" />
               </div>
               <div class="counts">
                 <span class="play-count">
@@ -138,6 +137,4 @@
   });
 </script>
 
-<style lang="scss" scoped>
-  // 移除所有样式，因为已经移到全局样式中
-</style>
+<style lang="scss" scoped></style>

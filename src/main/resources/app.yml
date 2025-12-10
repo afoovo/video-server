@@ -4,6 +4,16 @@ solon.app:
   name: 'VideoServer'
   group: 'VideoServer'
 
+# 默认的静态资源配置
+# resources/static/
+# 添加项目根目录创建static/uploads目录
+solon.staticfiles.mappings:
+  - path: "/static/uploads/"
+    repository: "./static/uploads/"
+#solon.staticfiles.mappings:
+#  - path: "/uploads/"
+#    repository: "file:///D:/clone/video-server/static/uploads/"
+
 # 以下为solon默认值
 solon.logging.appender:
   console:
@@ -42,18 +52,6 @@ server.request.maxHeaderSize: 8kb #kb,mb
 server.request.useTempfile: false #默认 false
 #设定上传文件大小阀值（v3.6.0 后支持）
 server.request.fileSizeThreshold: 10mb #默认 512kb
-# 自定义的静态资源配置不生效，使用不需要配置的默认配置,将所想相关目录代码修改为resources/static
-#solon.web:
-#  static:
-#    path: '/static/**'
-#    location: 'classpath:/static/'
-#
-#solon.staticfiles.mappings:
-#  - path: "/uploads/"
-#    repository: "classpath:D:/clone/video-server/static/"
-#solon.staticfiles.mappings:
-#  - path: "/"
-#    repository: "classpath:D:/clone/video-server/static/"
 
 mybatis-flex.datasource:
   default:
