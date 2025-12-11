@@ -16,7 +16,32 @@
         </el-upload>
       </div>
       <div class="user-info">
-        <div class="username">{{ userInfo.userName || '未知用户' }}</div>
+        <div class="username-container">
+          <div v-if="!isEditingUsername" class="username-display">
+            <div class="username">{{ userInfo.userName || '未知用户' }}</div>
+            <el-button
+              v-if="isViewingSelf"
+              class="edit-username-btn"
+              size="small"
+              type="text"
+              @click="startEditUsername"
+            >
+              编辑
+            </el-button>
+          </div>
+          <div v-else class="username-edit">
+            <el-input
+              v-model="usernameText"
+              maxlength="20"
+              placeholder="请输入用户名"
+              show-word-limit
+            />
+            <div class="username-actions">
+              <el-button size="small" @click="cancelEditUsername">取消</el-button>
+              <el-button size="small" type="primary" @click="saveUsername">保存</el-button>
+            </div>
+          </div>
+        </div>
         <div class="bio-container">
           <div v-if="!isEditingBio" class="bio">
             {{ userInfo.bio || '这个人很懒，什么都没写~' }}
@@ -87,6 +112,8 @@
   const videoListRef = ref();
   const isEditingBio = ref(false);
   const bioText = ref('');
+  const isEditingUsername = ref(false);
+  const usernameText = ref('');
   // 定义上传头像时的请求头
   const uploadHeaders = computed(() => {
     const token = localStorage.getItem('token');
@@ -207,6 +234,59 @@
     return isJPG && isLt2M;
   };
 
+  // 开始编辑用户名
+  const startEditUsername = () => {
+    isEditingUsername.value = true;
+    usernameText.value = userInfo.value.userName || '';
+  };
+
+  // 取消编辑用户名
+  const cancelEditUsername = () => {
+    isEditingUsername.value = false;
+    usernameText.value = '';
+  };
+
+  // 保存用户名
+  const saveUsername = async () => {
+    if (!usernameText.value.trim()) {
+      ElMessage.error('用户名不能为空');
+      return;
+    }
+
+    try {
+      loading.value = true;
+
+      const userId = userInfo.value.id;
+      const updatedUser = await updateUser(userId, { userName: usernameText.value });
+
+      if (updatedUser) {
+        userInfo.value.userName = updatedUser.userName;
+
+        // 如果是查看自己的资料，使用refreshUserInfo更新整个用户信息
+        if (isViewingSelf.value) {
+          try {
+            await userStore.refreshUserInfo();
+            // 更新本地userInfo引用
+            userInfo.value = userStore.userInfo;
+          } catch (refreshError) {
+            console.error('刷新用户信息失败:', refreshError);
+            // 降级处理：只更新userName字段
+            userStore.userInfo.userName = updatedUser.userName;
+            localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo));
+          }
+        }
+
+        ElMessage.success('用户名更新成功');
+        isEditingUsername.value = false;
+      }
+    } catch (error) {
+      console.error('更新用户名失败:', error);
+      ElMessage.error('更新用户名失败');
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // 开始编辑个人介绍
   const startEditBio = () => {
     isEditingBio.value = true;
@@ -315,15 +395,34 @@
     flex: 1;
     width: 100%;
 
+    .username-container {
+      margin-bottom: 0.5rem;
+      
+      .username-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        
+        @media (min-width: 768px) {
+          justify-content: flex-start;
+        }
+      }
+      
+      .username-edit {
+        .username-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+
     .username {
       font-size: 1.5rem;
       font-weight: bold;
       margin-bottom: 0.5rem;
-      text-align: center;
-
-      @media (min-width: 768px) {
-        text-align: left;
-      }
     }
 
     .bio-container {
@@ -391,6 +490,17 @@
           font-size: 0.9rem;
         }
       }
+    }
+  }
+  
+  .edit-username-btn {
+    font-size: 0.8rem;
+    padding: 0;
+    height: auto;
+    color: #409eff;
+
+    &:hover {
+      color: #66b1ff;
     }
   }
 </style>

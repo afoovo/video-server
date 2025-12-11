@@ -129,7 +129,7 @@
           }
 
           ElMessage.success('注册成功');
-          await router.push('/profile/edit');
+          await router.push(profile);
         } catch (error) {
           console.error('Register error:', error);
           if (error.response?.data?.message) {
