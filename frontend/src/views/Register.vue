@@ -58,6 +58,7 @@
   import { useRouter } from 'vue-router';
   import { ElMessage } from 'element-plus';
   import { register } from '@/api/auth';
+  import { useUserStore } from '@/stores/user';
 
   export default {
     name: 'Register',
@@ -110,14 +111,25 @@
       async function handleSubmit() {
         if (!registerForm.value) return;
         try {
-          await registerForm.value.validate();
           loading.value = true;
           const registerData = { ...formData };
           // console.log('注册数据:', registerData)
-          await register(registerData);
-          // console.log('注册响应:')
+          const response = await register(registerData);
+          // console.log('注册响应:', response)
+
+          // 保存token和用户信息到store和localStorage
+          const userStore = useUserStore();
+          if (response.token && response.user) {
+            userStore.token = response.token;
+            userStore.userInfo = response.user;
+
+            // 同时保存到localStorage以保持持久化
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('userInfo', JSON.stringify(response.user));
+          }
+
           ElMessage.success('注册成功');
-          router.push('/login');
+          await router.push('/profile/edit');
         } catch (error) {
           console.error('Register error:', error);
           if (error.response?.data?.message) {
@@ -141,6 +153,4 @@
   };
 </script>
 
-<style lang="scss" scoped>
-  // 移除所有样式，因为已经移到全局样式中
-</style>
+<style lang="scss" scoped></style>

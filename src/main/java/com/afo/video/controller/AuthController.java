@@ -1,12 +1,9 @@
 package com.afo.video.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.afo.video.common.api.AjaxJson;
+import com.afo.video.domain.User;
 import com.afo.video.service.AuthService;
-import org.noear.solon.annotation.Controller;
-import org.noear.solon.annotation.Inject;
-import org.noear.solon.annotation.Mapping;
-import org.noear.solon.annotation.Param;
+import org.noear.solon.annotation.*;
 
 /**
  * 登录注册
@@ -20,7 +17,8 @@ public class AuthController {
 
     /**
      * 登录
-     * @param account 账号
+     *
+     * @param account  账号
      * @param password 密码
      */
     @Mapping("/login")
@@ -30,13 +28,14 @@ public class AuthController {
 
     /**
      * 注册
-     * @param account 账号
-     * @param password 密码
+     *
+     * @param user 用户对象
      */
     @Mapping("/register")
-    public AjaxJson register(@Param("account") String account, @Param("password") String password) {
-        return authService.register(account, password);
+    public AjaxJson register(@Body User user) {
+        return authService.register(user);
     }
+
     /**
      * 登出
      */

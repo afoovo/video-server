@@ -284,7 +284,6 @@
           !processedComment.user.avatar.startsWith('/api/') &&
           !processedComment.user.avatar.startsWith('/static/')
         ) {
-          processedComment.user.avatar = `/api${processedComment.user.avatar}`;
         }
       }
 

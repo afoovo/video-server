@@ -8,6 +8,8 @@ import org.noear.solon.annotation.Managed;
 @Managed
 public interface AuthService extends IService<User> {
     AjaxJson login(String account, String password);
-    AjaxJson register(String account, String password);
+
+    AjaxJson register(User user);
+
     AjaxJson logout();
 }

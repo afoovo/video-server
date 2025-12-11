@@ -57,7 +57,7 @@
     if (!props.user?.avatar) {
       return new URL('@/assets/default-avatar.png', import.meta.url).href;
     }
-    return `${props.user.avatar}`;
+    return props.user.avatar;
   });
 
   // 处理关注/取消关注

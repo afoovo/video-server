@@ -1,0 +1,7 @@
+{
+  "framework": "solon",
+  "outPath": "src/main/resources/doc",
+  "projectName": "video-server",
+  "serverUrl": "http://localhost:8080",
+  "interface": "com.afo.video"
+}

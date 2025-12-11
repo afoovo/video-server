@@ -1,4 +1,21 @@
 # 视频平台前端项目
+## 0.开发计划清单
+开发计划：
+充分利用现有实现，按照项目最佳实践结构，不编写多余功能代码
+
+登录注册(主要是前端)目前有问题,改了部分代码丢失了,艹了
+
+信息完善页：
+- 完善用户信息：用户可以在个人中心页完善自己的信息，包括用户昵称、头像、个人介绍。
+- 首次注册的用户接着进行信息完善，修改昵称、上传头像、修改个人介绍。
+
+视频卡片组件：
+- 上传者：显示视频上传用户的昵称
+
+用户信息功能：
+- 个人中心页：用户基本信息、上传视频列表
+- 视频信息加入用户信息：视频上传者
+
 
 ## 1. 项目概述
 
@@ -6,44 +23,90 @@
 
 ### 1.1 技术栈
 
-| 技术 | 版本 | 用途 |
-| --- | --- | --- |
-| Vue | 3.5.25 | 前端框架 |
-| TypeScript | 5.9.3 | 类型系统 |
-| Vite | 7.2.4 | 构建工具 |
-| Element Plus | 2.11.8 | UI 组件库 |
-| Pinia | 3.0.4 | 状态管理 |
-| Vue Router | 4.6.3 | 路由管理 |
-| Axios | 1.13.2 | HTTP 客户端 |
-| Artplayer | 5.3.0 | 视频播放器 |
-| Sass | 1.94.2 | CSS 预处理器 |
-| Dayjs | 1.11.19 | 时间处理 |
-| Lodash-es | 4.17.21 | 工具库 |
+| 技术           | 版本      | 用途       |
+|--------------|---------|----------|
+| Vue          | 3.5.25  | 前端框架     |
+| TypeScript   | 5.9.3   | 类型系统     |
+| Vite         | 7.2.4   | 构建工具     |
+| Element Plus | 2.11.8  | UI 组件库   |
+| Pinia        | 3.0.4   | 状态管理     |
+| Vue Router   | 4.6.3   | 路由管理     |
+| Axios        | 1.13.2  | HTTP 客户端 |
+| Artplayer    | 5.3.0   | 视频播放器    |
+| Sass         | 1.94.2  | CSS 预处理器 |
+| Dayjs        | 1.11.19 | 时间处理     |
+| Lodash-es    | 4.17.21 | 工具库      |
 
 ### 1.2 项目结构
 
 ```
 ├── src/                      # 源码目录
 │   ├── api/                  # API 封装
+│   │   ├── auth.ts           # 认证相关 API
+│   │   ├── category.ts       # 分类相关 API
+│   │   ├── comment.ts        # 评论相关 API
+│   │   ├── user.ts           # 用户相关 API
+│   │   └── video.ts          # 视频相关 API
 │   ├── assets/               # 静态资源
+│   │   ├── default-avatar.png # 默认头像
+│   │   ├── default-cover.jpg # 默认封面
+│   │   └── logo.png          # 网站 Logo
 │   ├── components/           # 组件
 │   │   ├── comment/          # 评论相关组件
+│   │   │   └── CommentList.vue # 评论列表组件
 │   │   ├── common/           # 通用组件
+│   │   │   └── UserInfoDisplay.vue # 用户信息展示组件
 │   │   ├── layout/           # 布局组件
+│   │   │   ├── AppFooter.vue # 底部组件
+│   │   │   └── AppHeader.vue # 头部组件
 │   │   ├── user/             # 用户相关组件
+│   │   │   └── UserProfile.vue # 用户资料组件
 │   │   └── video/            # 视频相关组件
+│   │       ├── VideoCard.vue  # 视频卡片组件
+│   │       ├── VideoDetail.vue # 视频详情组件
+│   │       ├── VideoList.vue  # 视频列表组件
+│   │       ├── VideoPlayer.vue # 视频播放器组件
+│   │       └── VideoUpload.vue # 视频上传组件
 │   ├── router/               # 路由配置
+│   │   └── index.ts          # 路由主文件
 │   ├── stores/               # 状态管理
+│   │   ├── category.ts       # 分类状态管理
+│   │   ├── comment.ts        # 评论状态管理
+│   │   ├── user.ts           # 用户状态管理
+│   │   └── video.ts          # 视频状态管理
 │   ├── styles/               # 样式文件
+│   │   ├── global.scss       # 全局样式
+│   │   ├── layout.scss       # 布局样式
+│   │   ├── main.scss         # 主样式
+│   │   ├── mixins.scss       # 混合样式
+│   │   └── variables.scss    # 变量定义
 │   ├── types/                # 类型定义
+│   │   ├── comment.ts        # 评论类型
+│   │   ├── common.ts         # 通用类型
+│   │   ├── user.ts           # 用户类型
+│   │   └── video.ts          # 视频类型
 │   ├── utils/                # 工具函数
+│   │   ├── dayjs.ts          # 时间处理工具
+│   │   ├── env.ts            # 环境变量工具
+│   │   ├── format.ts         # 格式化工具
+│   │   └── request.ts        # 请求工具
 │   ├── views/                # 页面组件
+│   │   ├── About.vue         # 关于页面
+│   │   ├── FAQ.vue           # 常见问题页面
+│   │   ├── Home.vue          # 首页
+│   │   ├── Login.vue         # 登录页面
+│   │   ├── NotFound.vue      # 404页面
+│   │   ├── Register.vue      # 注册页面
+│   │   └── Trending.vue      # 热门视频页面
 │   ├── App.vue               # 根组件
 │   └── main.ts               # 入口文件
 ├── .env                      # 环境变量
+├── auto-imports.d.ts         # 自动导入类型定义
+├── components.d.ts           # 组件类型定义
 ├── index.html                # HTML 模板
 ├── package.json              # 项目配置
 ├── tsconfig.json             # TypeScript 配置
+├── tsconfig.node.json        # Node.js TypeScript 配置
 ├── vite.config.ts            # Vite 配置
 └── README.md                 # 项目文档
 ```
@@ -126,34 +189,34 @@ pnpm format
 
 采用 Pinia 进行状态管理，主要包括以下 store：
 
-| Store | 功能 |
-| --- | --- |
-| user | 用户信息管理 |
-| video | 视频信息管理 |
+| Store   | 功能     |
+|---------|--------|
+| user    | 用户信息管理 |
+| video   | 视频信息管理 |
 | comment | 评论信息管理 |
 
 ### 4.2 API 设计
 
 API 封装采用模块化设计，主要包括以下模块：
 
-| 模块 | 功能 |
-| --- | --- |
-| auth | 认证相关 API |
-| video | 视频相关 API |
-| user | 用户相关 API |
+| 模块      | 功能       |
+|---------|----------|
+| auth    | 认证相关 API |
+| video   | 视频相关 API |
+| user    | 用户相关 API |
 | comment | 评论相关 API |
 
 ### 4.3 路由设计
 
-| 路由 | 功能 | 认证要求 |
-| --- | --- | --- |
-| / | 首页 | 无 |
-| /trending | 热门视频 | 无 |
-| /video/:id | 视频详情 | 无 |
-| /login | 登录 | 游客 |
-| /register | 注册 | 游客 |
-| /upload | 上传视频 | 登录 |
-| /profile | 个人中心 | 登录 |
+| 路由         | 功能   | 认证要求 |
+|------------|------|------|
+| /          | 首页   | 无    |
+| /trending  | 热门视频 | 无    |
+| /video/:id | 视频详情 | 无    |
+| /login     | 登录   | 游客   |
+| /register  | 注册   | 游客   |
+| /upload    | 上传视频 | 登录   |
+| /profile   | 个人中心 | 登录   |
 
 ### 4.4 响应式设计
 
@@ -174,8 +237,7 @@ API 封装采用模块化设计，主要包括以下模块：
 
 ### 6.1 API 基础路径
 
-- 开发环境：`http://localhost:8080`
-- 生产环境：根据实际部署地址调整
+- `http://localhost:8080`
 
 ### 6.2 认证机制
 
@@ -183,10 +245,10 @@ API 封装采用模块化设计，主要包括以下模块：
 
 ```json
 {
-  "code": 0,              // 状态码，0 表示成功，非 0 表示失败
-  "msg": "",             // 提示信息
-  "data": {},            // 返回数据
-  "dataCount": 0         // 数据总数（用于分页）
+  "code": 0,          
+  "msg": "",          
+  "data": {},         
+  "dataCount": 0      
 }
 ```
 
@@ -210,35 +272,12 @@ API 封装采用模块化设计，主要包括以下模块：
 ### 7.2 组件设计
 
 - 组件职责单一
-- 支持 props 验证
 - 支持 TypeScript 类型定义
 
 ### 7.3 状态管理规范
 
 - 共享状态使用 Pinia
 - 异步操作在 store 中处理
-
-## 8. 对接开发计划清单
-
-### 8.1 已完成
-
-- [x] 前端框架搭建
-- [x] 路由配置
-- [x] 状态管理
-- [x] API 封装
-- [x] 主要页面组件创建
-- [x] 视频播放功能
-- [x] 用户认证功能
-- [x] 视频上传功能
-- [x] 适配后端sa-token认证机制
-### 8.2 待完成
-
-#### 8.2.1 核心
-
-- [ ] 接口对接
-- [ ] 参数对接
-- [ ] 
-
 
 ## 9. 常见问题解答
 
@@ -264,15 +303,3 @@ API 封装采用模块化设计，主要包括以下模块：
 1. 在 `src/components` 目录下创建新的组件
 2. 在需要的地方导入并使用组件
 3. 为组件添加 TypeScript 类型定义
-
-## 10. 联系方式
-
-- 项目负责人：[负责人姓名]
-- 技术支持：[技术支持邮箱]
-- 问题反馈：[问题反馈地址]
-
-## 11. 版本更新记录
-
-
-**文档更新时间：** 2025-11-27
-**文档版本：** v0.1.0

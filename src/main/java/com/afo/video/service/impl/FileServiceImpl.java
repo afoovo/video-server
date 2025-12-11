@@ -48,12 +48,6 @@ public class FileServiceImpl implements FileService {
                 return AjaxResult.error("请选择要上传的视频文件");
             }
 
-            // 检查文件类型是否为视频
-            String contentType = file.getContentType();
-            if (!contentType.startsWith("video/")) {
-                return AjaxResult.error("仅支持上传视频文件");
-            }
-
             // 检查文件大小是否超过限制
             long maxSizeBytes = ConfigureTransition.parseFileSize(maxFileSize);
             if (file.getContentSize() > maxSizeBytes) {
@@ -102,6 +96,9 @@ public class FileServiceImpl implements FileService {
                 } else {
                     return AjaxResult.error("封面文件必须为图片类型");
                 }
+            } else {
+                // 如果没有上传封面，默认使用视频文件作为封面
+                coverUrl = videoFileUrl;
             }
 
             // 创建视频对象并保存到数据库

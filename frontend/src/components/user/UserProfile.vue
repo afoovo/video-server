@@ -8,9 +8,8 @@
           v-if="isViewingSelf"
           :before-upload="beforeAvatarUpload"
           :headers="uploadHeaders"
-          :on-success="handleAvatarSuccess"
+          :http-request="customUploadAvatar"
           :show-file-list="false"
-          action="/user/uploadAvatar"
           class="avatar-uploader"
         >
           <el-button class="upload-btn" size="small" type="primary">更换头像</el-button>
@@ -77,7 +76,7 @@
   import { useRoute, useRouter } from 'vue-router';
   import VideoList from '@/components/video/VideoList.vue';
   import { ElMessage } from 'element-plus';
-  import { getUserInfo, updateUser } from '@/api/user';
+  import { getUserInfo, updateUser, uploadAvatar } from '@/api/user';
 
   const userStore = useUserStore();
   const route = useRoute();
@@ -98,7 +97,7 @@
     if (!userInfo.value?.avatarUrl) {
       return new URL('@/assets/default-avatar.png', import.meta.url).href;
     }
-    return `${userInfo.value.avatarUrl}`;
+    return userInfo.value.avatarUrl;
   });
 
   // 从路由参数获取用户ID，或者使用当前登录用户的ID
@@ -167,20 +166,29 @@
   watch(userInfo, () => {});
 
   // 处理头像上传成功
-  const handleAvatarSuccess = response => {
-    if (response && response.data) {
+  const customUploadAvatar = async options => {
+    const { file, onSuccess, onError } = options;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await uploadAvatar(formData);
+
       // 更新用户信息
-      userInfo.value.avatarUrl = response.data.avatarUrl;
+      userInfo.value.avatarUrl = response.avatarUrl;
 
       // 如果是查看自己的资料，同时更新store和本地存储
       if (isViewingSelf.value) {
-        userStore.userInfo.avatarUrl = response.data.avatarUrl;
+        userStore.userInfo.avatarUrl = response.avatarUrl;
         localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo));
       }
 
       ElMessage.success('头像更新成功');
-    } else {
+      onSuccess(response);
+    } catch (error) {
       ElMessage.error('头像上传失败');
+      onError(error);
     }
   };
 

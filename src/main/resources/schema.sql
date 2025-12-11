@@ -1,14 +1,64 @@
 CREATE DATABASE IF NOT EXISTS `video-server` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `video-server`;
-CREATE TABLE `video` (
-  `id` bigint NOT NULL,
-  `user_id` bigint DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `description` text,
-  `file_url` varchar(512) DEFAULT NULL,
-  `cover_url` varchar(512) DEFAULT NULL,
-  `duration` int DEFAULT NULL,
-  `status` int DEFAULT '1',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+create table `video-server`.category
+(
+    `id`          bigint NOT NULL auto_increment,
+    `name`        varchar(255) DEFAULT NULL comment '分类名称',
+    `description` text comment '分类描述',
+    `status`      int          DEFAULT '1',
+    `create_time` datetime     DEFAULT NULL,
+    `update_time` datetime     DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 comment '视频分类表';
+
+
+create table `video-server`.user
+(
+    id          bigint auto_increment primary key,
+    user_name   varchar(255) comment '用户名、用户昵称',
+    account     varchar(255) comment '账号',
+    password    varchar(255) comment '密码',
+    email       varchar(255) comment '邮箱',
+    sex         enum ('MAN','WOMAN','OTHER') comment '性别',
+    role_id     bigint comment '角色Id',
+    status      int          default 1 comment '状态',
+    create_time datetime,
+    update_time datetime,
+    salt        varchar(64) comment '密码盐',
+    avatar_url  varchar(512) default '/avatars/default-avatar.jpg' comment '头像URL'
+
+)
+    comment '用户表';
+
+
+
+create table `video-server`.video
+(
+    id          bigint auto_increment
+        primary key,
+    user_id     bigint        null comment '用户ID',
+    title       varchar(255)  null comment '视频标题',
+    description text          null comment '视频描述',
+    category_id bigint        null comment '分类ID',
+    file_url    varchar(512)  null comment '视频文件URL',
+    cover_url   varchar(512)  null comment '视频封面URL',
+    duration    int           null comment '视频时长（秒）',
+    status      int default 1 null,
+    create_time datetime      null,
+    update_time datetime      null,
+    constraint video_ibfk_1
+        foreign key (user_id) references `video-server`.user (id),
+    constraint video_ibfk_2
+        foreign key (category_id) references `video-server`.category (id)
+)
+    comment '视频表';
+
+create index category_id
+    on `video-server`.video (category_id);
+create index user_id
+    on `video-server`.video (user_id);
+-- 数据库查询会自动利用索引，无需修改impl或其他查询语句
+
+ALTER TABLE `video-server`.user
+    ADD COLUMN bio TEXT COMMENT '个人介绍';

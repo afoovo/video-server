@@ -15,6 +15,7 @@ import org.noear.solon.cloud.CloudClient;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.afo.video.domain.table.UserTableDef.USER;
@@ -27,10 +28,6 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
 
     @Override
     public AjaxJson login(String account, String password) {
-        // 参数校验
-        if (Utils.isEmpty(account) || Utils.isEmpty(password)) {
-            return AjaxJson.getError("账号或密码不能为空");
-        }
 
         // 查询用户 - 使用QueryWrapper构建查询条件
         QueryWrapper query = QueryWrapper.create()
@@ -66,44 +63,51 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
     }
 
     @Override
-    public AjaxJson register(String account, String password) {
-        // 参数校验
-        if (Utils.isEmpty(account) || Utils.isEmpty(password)) {
-            return AjaxJson.getError("账号或密码不能为空");
-        }
+    public AjaxJson register(User user) {
 
         // 检查账号是否已存在
         QueryWrapper query = QueryWrapper.create()
-                .where(USER.ACCOUNT.eq(account).or(USER.USER_NAME.eq(account)));
-        User existingUser = userMapper.selectOneByQuery(query);
+                .where(USER.ACCOUNT.eq(user.getAccount()).or(USER.USER_NAME.eq(user.getUserName())));
+        List<User> existingUsers = userMapper.selectListByQuery(query);
 
-        if (existingUser != null) {
+        if (!existingUsers.isEmpty()) {
             return AjaxJson.getError("账号已存在");
         }
 
-        // 创建新用户
-        User newUser = new User();
-        newUser.setId(CloudClient.id().generate());// 使用Solon-Cloud生成ID(默认实现为Snowflake)
-        newUser.setAccount(account);
-        newUser.setUserName(account);
+        // 设置用户ID
+        user.setId(CloudClient.id().generate());// 使用Solon-Cloud生成ID(默认实现为Snowflake)
 
         // 生成密码盐和加密密码
         String salt = Utils.guid();
-        String encryptedPassword = encryptPassword(password, salt);
+        String encryptedPassword = encryptPassword(user.getPassword(), salt);
 
-        newUser.setPassword(encryptedPassword);
-        newUser.setSalt(salt);
-        newUser.setStatus(1); // 启用状态
-        newUser.setSex("OTHER"); // 默认性别为其他
+        user.setPassword(encryptedPassword);
+        user.setSalt(salt);
+        user.setStatus(1); // 启用状态
+        user.setSex("OTHER"); // 默认性别为其他
 
         // 设置创建时间
-        newUser.setCreateTime(new Date());
+        user.setCreateTime(new Date());
 
         // 保存用户
-        boolean success = userMapper.insert(newUser) > 0;
+        boolean success = userMapper.insert(user) > 0;
 
         if (success) {
-            return AjaxJson.getSuccess("注册成功");
+            // 注册成功后自动登录
+            StpUtil.login(user.getId());
+
+            // 获取token信息
+            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+
+            // 返回注册结果
+            Map<String, Object> result = new HashMap<>();
+            result.put("token", tokenInfo.getTokenValue());
+            result.put("用户名", user.getUserName());
+            result.put("账号", user.getAccount());
+            result.put("邮箱", user.getEmail());
+            result.put("性别", user.getSex());
+
+            return AjaxJson.getSuccess("注册成功", result);
         } else {
             return AjaxJson.getError("注册失败");
         }

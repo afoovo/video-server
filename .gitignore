@@ -57,9 +57,3 @@ nbdist/
 !*/build/*.html
 !*/build/*.xml
 
-# 
-solon-examples/
-murky/
-static/uploads/**!/murky-master/
-/solon-examples/
-/murky-master/

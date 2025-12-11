@@ -63,13 +63,13 @@
   // 计算属性优化
   const isLoggedIn = computed(() => userStore.isLoggedIn);
   const username = computed(() => userStore.username);
+  // 计算用户头像
   const userAvatar = computed(() => {
-    const avatarPath = userStore.avatar;
-    // 如果没有头像路径，使用默认头像
-    if (!avatarPath) {
+    if (!userStore.avatar) {
       return new URL('@/assets/default-avatar.png', import.meta.url).href;
     }
-    return avatarPath;
+    // 直接使用store中的头像路径
+    return userStore.avatar;
   });
 
   // 监听路由变化，当离开搜索页面时清空搜索框
