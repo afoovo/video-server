@@ -132,16 +132,3 @@ export function searchVideos(keyword: string): Promise<Video[]> {
     method: 'get',
   });
 }
-
-/**
- * 获取视频播放URL
- * @param {string} id - 视频ID
- * @returns {string} 视频播放URL
- */
-export function getVideoPlayUrl(id: string): string {
-  return `/video/play/${id}`;
-}
-
-/**
- * 下载视频，需要添加 responseType: 'blob'
- */

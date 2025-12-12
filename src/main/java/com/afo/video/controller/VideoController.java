@@ -8,10 +8,8 @@ import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.annotation.Path;
-import org.noear.solon.core.handle.Context;
 import org.noear.solon.validation.annotation.Valid;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -79,30 +77,30 @@ public class VideoController {
     }
 
     /**
-     * 视频流式播放
+     * 视频流式播放，artplayer自带支持，接口暂时没用
      *
      * @param Id  视频ID
      * @param ctx 上下文
      */
-    @Mapping("/play/{Id}")
-    public void play(@Path("Id") Long Id, Context ctx) throws Throwable {
-        Video video = videoService.getById(Id);
-        if (video == null) {
-            ctx.render("视频不存在");
-            return;
-        }
-
-        String filePath = "static" + video.getFileUrl();
-        File file = new File(filePath);
-        if (!file.exists()) {
-            ctx.render("文件不存在：" + video.getTitle());
-            return;
-        }
-
-        // 设置响应头，支持视频流式播放
-        ctx.headerOrDefault("Content-Type", "video/mp4");
-        ctx.headerOrDefault("Accept-Ranges", "bytes");
-        ctx.outputAsFile(file);
-    }
+//    @Mapping("/play/{Id}")
+//    public void play(@Path("Id") Long Id, Context ctx) throws Throwable {
+//        Video video = videoService.getById(Id);
+//        if (video == null) {
+//            ctx.render("视频不存在");
+//            return;
+//        }
+//
+//        String filePath = "static" + video.getFileUrl();
+//        File file = new File(filePath);
+//        if (!file.exists()) {
+//            ctx.render("文件不存在：" + video.getTitle());
+//            return;
+//        }
+//
+//        // 设置响应头，支持视频流式播放
+//        ctx.headerOrDefault("Content-Type", "video/mp4");
+//        ctx.headerOrDefault("Accept-Ranges", "bytes");
+//        ctx.outputAsFile(file);
+//    }
 
 }

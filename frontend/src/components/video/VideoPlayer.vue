@@ -8,7 +8,6 @@
   import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
   import Artplayer from 'artplayer';
   import { ElMessage } from 'element-plus';
-  import { getVideoPlayUrl } from '@/api/video';
 
   const props = defineProps<{
     url: string;
@@ -39,30 +38,12 @@
         art = null;
       }
 
-      // 使用API函数获取视频播放URL
-      let videoUrl = getVideoPlayUrl(props.videoId);
-
-      // 确保URL格式正确，添加/api前缀（如果需要）
-      if (
-        !videoUrl.startsWith('http://') &&
-        !videoUrl.startsWith('https://') &&
-        !videoUrl.startsWith('/api')
-      ) {
-        videoUrl = `/api${videoUrl}`;
-      }
-
-      // 正确处理海报URL
-      let posterUrl = props.poster || '';
-      if (posterUrl && !posterUrl.startsWith('http://') && !posterUrl.startsWith('https://')) {
-        posterUrl = posterUrl.startsWith('/api') ? posterUrl : `/api${posterUrl}`;
-      }
-
       // 使用Artplayer基本配置，添加基础播放控件
       art = new Artplayer({
         //去掉var以避免作用域问题
         container: artRef.value as HTMLDivElement,
-        url: videoUrl,
-        poster: posterUrl,
+        url: props.url,
+        poster: props.poster,
         autoplay: false, // 自动播放
         muted: false, // 静音
         volume: 0.7, // 音量
@@ -105,6 +86,8 @@
         emit('error', error);
         ElMessage.error('视频播放失败，请刷新页面重试');
       });
+
+      emit('ready', art);
     } catch (error) {
       ElMessage.error('视频加载失败，请稍后重试');
       console.error('Video player initialization error:', error);

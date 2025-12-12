@@ -32,6 +32,7 @@
 
   const router = useRouter();
   const props = defineProps({
+    // 定义props，idea问题会出现报错，请忽略
     userId: {
       type: [String],
       default: null,
@@ -111,6 +112,7 @@
 
   // 暴露方法给父组件
   defineExpose({
+    // 暴露一个方法给父组件调用，idea问题会出现报错，请忽略
     fetchVideos,
     // 也可以暴露其他方法，如果需要的话
     loadVideos: fetchVideos, // 为了兼容性，提供一个别名
