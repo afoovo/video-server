@@ -251,14 +251,6 @@
   }
 }
 
-// 视频播放器样式 - 这些样式应该由组件内部样式覆盖
-.video-player {
-  width: 100%;
-  height: 100%;
-  min-height: 400px;
-  background-color: #000;
-}
-
 // 评论列表样式
 .comment-list {
   .comment-input {
@@ -840,71 +832,7 @@
   }
 }
 
-// 用户资料页面样式
-.user-profile {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: $spacing-lg;
 
-  .profile-header {
-    background: $white;
-    border-radius: $border-radius-md;
-    padding: $spacing-lg;
-    margin-bottom: $spacing-lg;
-    box-shadow: $box-shadow-sm;
-
-    .user-info {
-      display: flex;
-      gap: $spacing-lg;
-
-      .info-content {
-        flex: 1;
-
-        .username {
-          margin: 0 0 $spacing-sm;
-          font-size: $font-size-xl;
-          font-weight: 500;
-          color: $text-color;
-        }
-
-        .bio {
-          margin: 0 0 $spacing-md;
-          color: $text-color-secondary;
-          line-height: $line-height-base;
-        }
-
-        .stats {
-          display: flex;
-          gap: $spacing-xl;
-
-          .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            .count {
-              font-size: $font-size-lg;
-              font-weight: 500;
-              color: $text-color;
-            }
-
-            .label {
-              font-size: $font-size-sm;
-              color: $text-color-secondary;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .profile-content {
-    background: $white;
-    border-radius: $border-radius-md;
-    padding: $spacing-lg;
-    box-shadow: $box-shadow-sm;
-  }
-}
 
 // 注册页面样式
 .register-container {
@@ -963,20 +891,7 @@
     }
   }
 
-  .user-profile {
-    padding: $spacing-md;
 
-    .profile-header {
-      .user-info {
-        flex-direction: column;
-        text-align: center;
-
-        .stats {
-          justify-content: center;
-        }
-      }
-    }
-  }
 
   .register-container {
     padding: $spacing-md;

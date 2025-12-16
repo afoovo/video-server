@@ -96,7 +96,7 @@
   };
 
   const goToProfile = () => {
-    router.push('/profile');
+    router.push(`/profile/${userStore.userId}`);
   };
 
   const handleCommand = command => {

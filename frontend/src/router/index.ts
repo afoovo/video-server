@@ -101,7 +101,7 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/profile',
+    path: '/profile/:id?',
     name: 'profile',
     component: () => import('@/components/user/UserProfile.vue').then(m => m.default || m),
     meta: {

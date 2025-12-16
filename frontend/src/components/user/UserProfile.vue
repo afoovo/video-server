@@ -3,7 +3,16 @@
   <div v-loading="loading" class="user-profile">
     <div v-if="userInfo" class="profile-header">
       <div class="avatar-container">
-        <el-avatar :size="100" :src="avatarUrl" class="user-avatar" />
+        <div
+          class="avatar-wrapper"
+          @mouseenter="showUploadHint = true"
+          @mouseleave="showUploadHint = false"
+        >
+          <el-avatar :size="100" :src="avatarUrl" class="user-avatar" />
+          <div v-if="isViewingSelf && showUploadHint" class="avatar-overlay">
+            <span class="overlay-text">更换头像</span>
+          </div>
+        </div>
         <el-upload
           v-if="isViewingSelf"
           :before-upload="beforeAvatarUpload"
@@ -12,7 +21,12 @@
           :show-file-list="false"
           class="avatar-uploader"
         >
-          <el-button class="upload-btn" size="small" type="primary">更换头像</el-button>
+          <el-button
+            class="upload-btn"
+            size="small"
+            style="display: none"
+            type="primary"
+          ></el-button>
         </el-upload>
       </div>
       <div class="user-info">
@@ -42,38 +56,37 @@
             </div>
           </div>
         </div>
-        <div class="bio-container">
-          <div v-if="!isEditingBio" class="bio">
+        <div
+          class="bio-container"
+          @mouseenter="isViewingSelf && (showBioEditIcon = true)"
+          @mouseleave="showBioEditIcon = false"
+        >
+          <div v-if="!isEditingBio" class="bio" @dblclick="isViewingSelf && startEditBio()">
             {{ userInfo.bio || '这个人很懒，什么都没写~' }}
+            <el-button
+              v-if="showBioEditIcon && isViewingSelf"
+              class="edit-bio-icon"
+              link
+              size="small"
+              type="primary"
+              @click="startEditBio"
+            >
+              <el-icon>
+                <Edit />
+              </el-icon>
+            </el-button>
           </div>
           <div v-else class="bio-edit">
             <el-input
+              ref="bioInputRef"
               v-model="bioText"
-              :rows="3"
-              maxlength="200"
+              :autosize="{ minRows: 1, maxRows: 1 }"
+              maxlength="100"
               placeholder="介绍一下你自己..."
-              show-word-limit
               type="textarea"
+              @blur="saveBio"
+              @keydown.enter.exact.prevent="saveBio"
             />
-            <div class="bio-actions">
-              <el-button size="small" @click="cancelEditBio">取消</el-button>
-              <el-button size="small" type="primary" @click="saveBio">保存</el-button>
-            </div>
-          </div>
-          <el-button
-            v-if="isViewingSelf && !isEditingBio"
-            class="edit-bio-btn"
-            size="small"
-            type="text"
-            @click="startEditBio"
-          >
-            编辑简介
-          </el-button>
-        </div>
-        <div class="stats">
-          <div class="stat-item">
-            <span class="count">{{ userInfo.videoCount || 0 }}</span>
-            <span class="label">视频</span>
           </div>
         </div>
       </div>
@@ -101,6 +114,7 @@
   import { useRoute, useRouter } from 'vue-router';
   import VideoList from '@/components/video/VideoList.vue';
   import { ElMessage } from 'element-plus';
+  import { Edit } from '@element-plus/icons-vue';
   import { getUserInfo, updateUser, uploadAvatar } from '@/api/user';
 
   const userStore = useUserStore();
@@ -114,6 +128,10 @@
   const bioText = ref('');
   const isEditingUsername = ref(false);
   const usernameText = ref('');
+  const showUploadHint = ref(false); // 控制是否显示上传提示
+  const showBioEditIcon = ref(false); // 控制是否显示编辑图标
+  const bioInputRef = ref(null); // 简介输入框引用
+
   // 定义上传头像时的请求头
   const uploadHeaders = computed(() => {
     const token = localStorage.getItem('token');
@@ -128,33 +146,45 @@
   });
 
   // 从路由参数获取用户ID，或者使用当前登录用户的ID
-  const userId = computed(() => userStore.userId);
+  const userId = computed(() => route.params.id || userStore.userId);
 
   // 是否查看自己的个人资料
-  const isViewingSelf = computed(() => !route.params.id && userStore.isLoggedIn);
+  const isViewingSelf = computed(
+    () =>
+      !route.params.id ||
+      route.params.id === userStore.userId?.toString() ||
+      (!route.params.id && userStore.isLoggedIn)
+  );
 
   const loadUserInfo = async () => {
     loading.value = true; // 确保在开始时设置loading状态
 
     try {
-      if (isViewingSelf.value) {
+      // 检查是否查看的是自己的资料
+      const isSelfProfile = !route.params.id || route.params.id === userStore.userId?.toString();
+
+      if (isSelfProfile && !route.params.id) {
         console.log('查看自己的个人资料');
         // 如果是查看自己的资料，直接从store中获取
         if (userStore.userInfo && Object.keys(userStore.userInfo).length > 0) {
           userInfo.value = userStore.userInfo;
           console.log('从userStore获取用户信息:', userInfo.value);
+          loading.value = false;
           return; // 成功从store获取，直接返回
         }
         // 没有从store获取到，继续使用API获取
       }
 
+      // 检查是否有有效的用户ID
       if (!userId.value) {
         console.error('没有可用的用户ID，检查是否已登录');
         if (!userStore.isLoggedIn) {
           ElMessage.warning('请先登录');
           await router.push('/login');
+          loading.value = false;
           return;
         }
+        loading.value = false;
         return; // 没有userId但已登录，可能是其他原因
       }
 
@@ -165,7 +195,7 @@
       if (res && res.id) {
         userInfo.value = res;
         // 如果是自己的资料，同时更新store
-        if (isViewingSelf.value) {
+        if (isSelfProfile) {
           userStore.userInfo = res;
           localStorage.setItem('userInfo', JSON.stringify(res));
         }
@@ -184,8 +214,10 @@
   // 当路由参数变化时，重新加载用户信息
   watch(
     () => route.params.id,
-    () => {
-      loadUserInfo();
+    (newId, oldId) => {
+      if (newId !== oldId) {
+        loadUserInfo();
+      }
     }
   );
 
@@ -291,18 +323,21 @@
   const startEditBio = () => {
     isEditingBio.value = true;
     bioText.value = userInfo.value.bio || '';
-  };
 
-  // 取消编辑个人介绍
-  const cancelEditBio = () => {
-    isEditingBio.value = false;
-    bioText.value = '';
+    // 在下一帧聚焦到输入框
+    setTimeout(() => {
+      bioInputRef.value?.focus();
+    }, 0);
   };
 
   // 保存个人介绍
   const saveBio = async () => {
     try {
-      loading.value = true;
+      // 如果内容没有改变，则直接退出编辑模式
+      if (bioText.value === (userInfo.value.bio || '')) {
+        isEditingBio.value = false;
+        return;
+      }
 
       const userId = userInfo.value.id;
       const updatedUser = await updateUser(userId, { bio: bioText.value });
@@ -330,8 +365,6 @@
     } catch (error) {
       console.error('更新个人介绍失败:', error);
       ElMessage.error('更新个人介绍失败');
-    } finally {
-      loading.value = false;
     }
   };
 
@@ -361,17 +394,30 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/styles/variables' as *;
+  @use '@/styles/mixins' as *;
+
+  .user-profile {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-lg;
+  }
+
   .profile-header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem 0;
-    gap: 1.5rem;
+    padding: $spacing-lg;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-lg;
 
-    @media (min-width: 768px) {
+    @media (min-width: $breakpoint-md) {
       flex-direction: row;
       align-items: flex-start;
-      padding: 2rem;
+    }
+
+    @media (max-width: $breakpoint-md) {
+      padding: $spacing-md;
     }
   }
 
@@ -380,15 +426,41 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: $spacing-md;
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    cursor: pointer;
   }
 
   .user-avatar {
-    border: 3px solid #f0f0f0;
+    border: 3px solid $border-color;
+    box-shadow: $box-shadow-sm;
+  }
+
+  .avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%; /* 保持圆形 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: $font-size-sm;
+    transition: opacity 0.3s ease;
+  }
+
+  .overlay-text {
+    text-align: center;
   }
 
   .upload-btn {
-    font-size: 0.8rem;
+    font-size: $font-size-sm;
   }
 
   .user-info {
@@ -396,78 +468,80 @@
     width: 100%;
 
     .username-container {
-      margin-bottom: 0.5rem;
-      
+      margin-bottom: $spacing-sm;
+
       .username-display {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: $spacing-sm;
         justify-content: center;
-        
-        @media (min-width: 768px) {
+
+        @media (min-width: $breakpoint-md) {
           justify-content: flex-start;
         }
       }
-      
+
       .username-edit {
         .username-actions {
           display: flex;
           justify-content: flex-end;
-          gap: 0.5rem;
-          margin-top: 0.5rem;
+          gap: $spacing-sm;
+          margin-top: $spacing-sm;
         }
       }
     }
 
     .username {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+      font-size: $font-size-xl;
+      font-weight: 500;
+      margin-bottom: $spacing-sm;
+      color: $text-color;
     }
 
     .bio-container {
-      margin-bottom: 1rem;
+      margin-bottom: $spacing-md;
       position: relative;
 
-      .bio {
-        color: #666;
-        margin-bottom: 0.5rem;
-        text-align: center;
+      &:hover {
+        .edit-bio-icon {
+          opacity: 1;
+        }
+      }
 
-        @media (min-width: 768px) {
+      .bio {
+        color: $text-color-secondary;
+        margin-bottom: $spacing-sm;
+        text-align: center;
+        line-height: $line-height-base;
+        position: relative;
+        padding-right: 30px;
+        cursor: pointer;
+
+        @media (min-width: $breakpoint-md) {
           text-align: left;
+        }
+
+        .edit-bio-icon {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          opacity: 0;
+          transition: opacity 0.3s;
         }
       }
 
       .bio-edit {
-        margin-bottom: 0.5rem;
-
-        .bio-actions {
-          display: flex;
-          justify-content: flex-end;
-          gap: 0.5rem;
-          margin-top: 0.5rem;
-        }
-      }
-
-      .edit-bio-btn {
-        font-size: 0.8rem;
-        padding: 0;
-        height: auto;
-        color: #409eff;
-
-        &:hover {
-          color: #66b1ff;
-        }
+        margin-bottom: $spacing-sm;
       }
     }
 
     .stats {
       display: flex;
       justify-content: center;
-      gap: 2rem;
+      gap: $spacing-xl;
 
-      @media (min-width: 768px) {
+      @media (min-width: $breakpoint-md) {
         justify-content: flex-start;
       }
 
@@ -476,31 +550,32 @@
         flex-direction: column;
         align-items: center;
 
-        @media (min-width: 768px) {
+        @media (min-width: $breakpoint-md) {
           align-items: flex-start;
         }
 
         .count {
-          font-size: 1.5rem;
-          font-weight: bold;
+          font-size: $font-size-lg;
+          font-weight: 500;
+          color: $text-color;
         }
 
         .label {
-          color: #666;
-          font-size: 0.9rem;
+          color: $text-color-secondary;
+          font-size: $font-size-sm;
         }
       }
     }
   }
-  
+
   .edit-username-btn {
-    font-size: 0.8rem;
+    font-size: $font-size-sm;
     padding: 0;
     height: auto;
-    color: #409eff;
+    color: $primary-color;
+  }
 
-    &:hover {
-      color: #66b1ff;
-    }
+  .profile-content {
+    padding: $spacing-lg;
   }
 </style>
