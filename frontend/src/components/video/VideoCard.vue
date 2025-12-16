@@ -2,8 +2,8 @@
   <div class="video-card" @click="handleClick">
     <div class="video-cover">
       <img
-        :src="video.coverUrl ? video.coverUrl : defaultCover"
         :alt="video.title"
+        :src="video.coverUrl || defaultCover"
         class="cover-image"
         @error="handleImageError"
       />
@@ -23,17 +23,12 @@
     </div>
 
     <div class="video-info">
-      <h3 class="title" :title="video.title">
+      <h3 :title="video.title" class="title">
         {{ video.title }}
       </h3>
       <div class="meta">
-        <div class="uploader" @click.stop="handleUploaderClick">
-          <UserInfoDisplay
-            :user="video.user"
-            :size="24"
-            :show-followers="false"
-            :show-follow-button="false"
-          />
+        <div class="uploader">
+          <span class="user-name" @click.stop="goToUserProfile">{{ userName }}</span>
         </div>
         <div class="stats">
           <span class="upload-time">{{
@@ -45,15 +40,17 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  import { View, Star } from '@element-plus/icons-vue';
-  import { formatNumber, formatTime, formatDuration } from '@/utils/format';
-  // 导入默认资源，使用require语法避免类型问题
+<script lang="ts" setup>
+  import { Star, View } from '@element-plus/icons-vue';
+  import { formatDuration, formatNumber, formatTime } from '@/utils/format';
+  import { onMounted, ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { getUserInfo } from '@/api/user';
+
+  // 导入默认资源
   const defaultCover = new URL('@/assets/default-cover.jpg', import.meta.url).href;
 
-  import UserInfoDisplay from '@/components/common/UserInfoDisplay.vue';
-
-  // 为VideoCard定义独立的Props接口，避免与Video接口冲突
+  // 为VideoCard定义独立的Props接口
   interface VideoCardProps {
     video: {
       id: string;
@@ -64,11 +61,7 @@
       viewCount?: number;
       likeCount?: number;
       createTime?: string | Date;
-      user?: {
-        id?: string;
-        userName?: string;
-        avatar?: string;
-      };
+      userId?: string;
     };
   }
 
@@ -76,17 +69,14 @@
 
   const emit = defineEmits<{
     click: [video: VideoCardProps['video']];
-    'uploader-click': [user: VideoCardProps['video']['user']];
   }>();
+
+  const router = useRouter();
+  const userName = ref('');
+  const userId = ref('');
 
   const handleClick = (): void => {
     emit('click', props.video);
-  };
-
-  const handleUploaderClick = (): void => {
-    if (props.video.user) {
-      emit('uploader-click', props.video.user);
-    }
   };
 
   const handleImageError = (e: Event): void => {
@@ -97,6 +87,33 @@
       target.src = defaultCover;
     }
   };
+
+  // 获取用户名
+  const fetchUserName = async () => {
+    if (props.video.userId) {
+      try {
+        const user = await getUserInfo(props.video.userId);
+        userName.value = user.userName;
+        userId.value = user.id;
+      } catch (error) {
+        console.error('获取用户信息失败:', error);
+        userName.value = '未知用户';
+      }
+    } else {
+      userName.value = '未知用户';
+    }
+  };
+
+  // 跳转到用户个人资料页面
+  const goToUserProfile = () => {
+    if (userId.value) {
+      router.push(`/profile/${userId.value}`);
+    }
+  };
+
+  onMounted(() => {
+    fetchUserName();
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -105,26 +122,23 @@
 
   .video-card {
     position: relative;
-    border-radius: $border-radius-md;
     overflow: hidden;
     background: $white;
     cursor: pointer;
     transition: transform 0.2s ease;
     will-change: transform;
 
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: $box-shadow-md;
-    }
+    //&:hover {
+    //  transform: translateY(-4px);
+    //  box-shadow: $box-shadow-md;
+    //}悬停上浮
 
     .video-cover {
       position: relative;
       width: 100%;
+      aspect-ratio: 16/9;
 
       .cover-image {
-        position: absolute;
-        top: 0;
-        left: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -136,7 +150,6 @@
         bottom: $spacing-xs;
         right: $spacing-xs;
         padding: 2px 4px;
-        background: rgba(0, 0, 0, 0.7);
         color: $white;
         border-radius: $border-radius-sm;
         font-size: $font-size-sm;
@@ -154,7 +167,6 @@
         span {
           @include flex-center;
           gap: 4px;
-          background: rgba(0, 0, 0, 0.7);
           padding: 2px 4px;
           border-radius: $border-radius-sm;
         }
@@ -166,35 +178,42 @@
 
       .title {
         margin: 0 0 8px;
+        @include text-truncate(2);
         font-size: $font-size-base;
+        line-height: $line-height-base;
         font-weight: 500;
         color: $text-color;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        line-height: 1.4;
+
+        &:hover {
+          transition: color 0.2s ease;
+          color: $primary-color;
+        }
       }
 
       .meta {
-        @include flex-center;
-        gap: $spacing-sm;
-        color: $text-color-secondary;
-        font-size: $font-size-sm;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         .uploader {
-          @include flex-center;
-          gap: 4px;
-          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
 
-          &:hover {
-            color: $primary-color;
+          .user-name {
+            font-size: $font-size-sm;
+            color: $text-color-secondary;
+            cursor: pointer;
+
+            &:hover {
+              color: $primary-color;
+            }
           }
         }
 
         .stats {
-          margin-left: auto;
+          color: $text-color-secondary;
+          font-size: $font-size-sm;
         }
       }
     }
