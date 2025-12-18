@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
   import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
   import Artplayer from 'artplayer';
   import { ElMessage } from 'element-plus';
@@ -118,6 +118,13 @@
 </script>
 
 <style lang="scss" scoped>
+  .video-player {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    background-color: #000;
+  }
+
   .video-player-wrapper {
     position: relative;
     width: 100%;

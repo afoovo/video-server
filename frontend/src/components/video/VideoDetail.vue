@@ -1,40 +1,41 @@
 <template>
   <div v-loading="loading" class="video-detail">
-    <div class="main-content">
-      <!-- 视频播放器 -->
-      <div class="video-player-container">
-        <VideoPlayer
-          v-if="video && video.fileUrl"
-          :url="video.fileUrl"
-          :poster="video.coverUrl || ''"
-          :title="video.title"
-          :video-id="videoId"
-          @ready="handlePlayerReady"
-          @play="handlePlayerPlay"
-          @error="handlePlayerError"
-        />
-      </div>
-
-      <!-- 视频信息 -->
-      <div v-if="video" class="video-info">
-        <h1 class="title">
+    <div class="content-wrapper">
+      <div class="main-content">
+        <!-- 视频标题 -->
+        <h1 v-if="video" class="video-title">
           {{ video.title }}
         </h1>
-        <div class="meta">
-          <span class="time">{{ formatTime(video.createTime) }}</span>
-        </div>
 
-        <div class="description">
-          {{ video.description }}
-        </div>
-
-        <div v-if="video.user" class="uploader">
-          <UserInfoDisplay
-            :user="video.user"
-            :size="40"
-            :show-followers="true"
-            :show-follow-button="true"
+        <!-- 视频播放器 -->
+        <div class="video-player-container">
+          <VideoPlayer
+            v-if="video && video.fileUrl"
+            :poster="video.coverUrl || ''"
+            :title="video.title"
+            :url="video.fileUrl"
+            :video-id="videoId"
+            @error="handlePlayerError"
+            @play="handlePlayerPlay"
+            @ready="handlePlayerReady"
           />
+        </div>
+
+        <!-- 视频详情 -->
+        <div v-if="video" class="video-description">
+          <div class="meta">
+            <span class="time">{{ formatTime(video.createTime) }}</span>
+          </div>
+          <div class="description">
+            {{ video.description }}
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧栏 -->
+      <div class="rightbar">
+        <div v-if="video && video.userId" class="user-card-wrapper">
+          <UserCard :avatar-size="60" :show-account="true" :user-id="video.userId" />
         </div>
       </div>
     </div>
@@ -48,7 +49,7 @@
   import { getVideoDetail } from '@/api/video';
   import { formatTime } from '@/utils/format';
   import VideoPlayer from './VideoPlayer.vue';
-  import UserInfoDisplay from '@/components/common/UserInfoDisplay.vue';
+  import UserCard from '@/components/user/UserCard.vue';
 
   const route = useRoute();
 
@@ -104,47 +105,82 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    min-height: 100vh;
+
+    .content-wrapper {
+      display: flex;
+      gap: 20px;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
+    }
 
     .main-content {
+      flex: 1;
+      min-width: 0;
+
+      .video-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        text-align: left;
+        color: var(--el-text-color-primary);
+      }
+
       .video-player-container {
         position: relative;
         width: 100%;
         height: 0;
-        padding-bottom: 56.25%; // 16:9 宽高比
+        padding-bottom: 56.25%;
         background: #000;
         margin-bottom: 20px;
         border-radius: 4px;
         overflow: hidden;
       }
 
-      .video-info {
+      .video-description {
         padding: 20px;
         background: var(--el-bg-color);
         border-radius: var(--el-border-radius-base);
         margin-bottom: 20px;
-
-        .title {
-          font-size: 24px;
-          font-weight: 600;
-          margin-bottom: 16px;
-        }
+        text-align: left;
+        //box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
         .meta {
           color: var(--el-text-color-secondary);
           margin-bottom: 15px;
+          padding-bottom: 15px;
+          border-bottom: 1px solid var(--el-border-color-lighter);
         }
 
         .description {
           white-space: pre-wrap;
-          margin-bottom: 20px;
           color: var(--el-text-color-regular);
+          line-height: 1.5;
         }
+      }
+    }
 
-        .uploader {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
+    .rightbar {
+      width: 300px;
+
+      @media (max-width: 768px) {
+        width: 100%;
+      }
+    }
+
+    .related-videos {
+      background-color: var(--el-bg-color);
+      border-radius: var(--el-border-radius-base);
+      padding: 20px;
+      margin-top: 20px;
+
+      h3 {
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--el-text-color-primary);
+        margin-bottom: 16px;
       }
     }
   }

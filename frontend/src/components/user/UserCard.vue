@@ -3,6 +3,7 @@
     <div class="user-avatar">
       <el-avatar
         :alt="displayUser?.userName || '未知用户'"
+        :size="avatarSize"
         :src="avatarUrl"
         @error="handleAvatarError"
       />
@@ -26,7 +27,12 @@
     user?: User;
     userId?: string | null;
     showAccount?: boolean;
+    avatarSize?: number | string;
   }>();
+
+  const avatarSize = computed(() => {
+    return props.avatarSize || 50;
+  });
 
   const emit = defineEmits<{
     click: [user: User];
@@ -111,16 +117,16 @@
     padding: 16px;
     border-radius: 8px;
     background: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    //box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: all 0.3s ease;
     border: 1px solid #e4e7ed;
   }
 
   .user-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    border-color: #409eff;
+    //transform: translateY(-2px);
+    //box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    //border-color: #409eff;
   }
 
   .user-avatar {
