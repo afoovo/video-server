@@ -8,5 +8,4 @@ import org.noear.solon.annotation.Managed;
 
 @Managed
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
-
 }

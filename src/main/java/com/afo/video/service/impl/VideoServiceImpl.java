@@ -14,8 +14,6 @@ import static com.afo.video.domain.table.VideoTableDef.VIDEO;
 
 @Managed
 public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements VideoService {
-    @Inject
-    private VideoMapper videoMapper;
 
     @Override
     public List<Video> search(String keyword) {
@@ -25,7 +23,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
                 .where(VIDEO.TITLE.like(keyword))
                 .or(VIDEO.DESCRIPTION.like(keyword));
 
-        return videoMapper.selectListByQuery(queryWrapper);
+        return getMapper().selectListByQuery(queryWrapper);
     }
 
     @Override
@@ -35,7 +33,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
                 .from(VIDEO)
                 .where(VIDEO.USER_ID.eq(userId));
 
-        return videoMapper.selectListByQuery(queryWrapper);
+        return getMapper().selectListByQuery(queryWrapper);
     }
 
     @Override
@@ -45,7 +43,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
                 .from(VIDEO)
                 .where(VIDEO.CATEGORY_ID.eq(id));
 
-        return videoMapper.selectListByQuery(queryWrapper);
+        return getMapper().selectListByQuery(queryWrapper);
     }
 
 

@@ -29,7 +29,7 @@ import java.util.Map;
  * 文件服务实现类
  */
 @Managed
-public class FileServiceImpl implements FileService {
+public class FileServiceImpl implements FileService {//因为需要操作两个实体和两个mapper，泛型不支持，所以不继承ServiceImpl，手动注入这两个mapper。也可以泛型指定主要的video，然后注入次要的user
 
     private final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
 

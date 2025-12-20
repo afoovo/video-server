@@ -9,7 +9,6 @@ import com.afo.video.service.AuthService;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.solon.service.impl.ServiceImpl;
 import org.noear.solon.Utils;
-import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Managed;
 import org.noear.solon.cloud.CloudClient;
 
@@ -23,16 +22,13 @@ import static com.afo.video.domain.table.UserTableDef.USER;
 @Managed
 public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements AuthService {
 
-    @Inject
-    private UserMapper userMapper;
-
     @Override
     public AjaxJson login(String account, String password) {
 
         // 查询用户 - 使用QueryWrapper构建查询条件
         QueryWrapper query = QueryWrapper.create()
                 .where(USER.ACCOUNT.eq(account).or(USER.USER_NAME.eq(account)));
-        User user = userMapper.selectOneByQuery(query);
+        User user = getMapper().selectOneByQuery(query);
 
         if (user == null) {
             return AjaxJson.getError("用户不存在");
@@ -68,7 +64,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
         // 检查账号是否已存在
         QueryWrapper query = QueryWrapper.create()
                 .where(USER.ACCOUNT.eq(user.getAccount()).or(USER.USER_NAME.eq(user.getUserName())));
-        List<User> existingUsers = userMapper.selectListByQuery(query);
+        List<User> existingUsers = getMapper().selectListByQuery(query);
 
         if (!existingUsers.isEmpty()) {
             return AjaxJson.getError("账号已存在");
@@ -90,7 +86,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, User> implements Au
         user.setCreateTime(new Date());
 
         // 保存用户
-        boolean success = userMapper.insert(user) > 0;
+        boolean success = getMapper().insert(user) > 0;
 
         if (success) {
             // 注册成功后自动登录
