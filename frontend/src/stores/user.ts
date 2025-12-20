@@ -95,10 +95,6 @@ export const useUserStore = defineStore('user', () => {
     try {
       const response = await loginApi(credentials);
 
-      if (!response || !response.token || !response.user) {
-        throw new Error('登录响应格式错误');
-      }
-
       // 保存token和用户信息
       token.value = response.token;
       userInfo.value = response.user;
