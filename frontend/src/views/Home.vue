@@ -73,6 +73,7 @@
 
   // 分类数据
   const categories = [
+    { id: 'bangumi', name: '番剧', icon: 'Collection' },
     { id: 'all', name: '全部', icon: 'VideoPlay' },
     { id: 'gaming', name: '游戏', icon: 'GameController' },
     { id: 'music', name: '音乐', icon: 'Headset' },
@@ -151,6 +152,12 @@
   };
 
   const handleCategoryChange = categoryId => {
+    // 如果点击的是Bangumi分类，则跳转到Bangumi页面
+    if (categoryId === 'bangumi') {
+      router.push('/bangumi');
+      return;
+    }
+
     activeCategory.value = categoryId;
     currentPage.value = 1;
     loadVideos();

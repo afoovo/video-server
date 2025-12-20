@@ -12,7 +12,7 @@ export default defineConfig({
         defineModel: true,
         propsDestructure: true,
       },
-    }) as Plugin,
+    }),
 
     AutoImport({
       resolvers: [ElementPlusResolver()],
@@ -21,7 +21,7 @@ export default defineConfig({
         enabled: false,
       },
       dts: './auto-imports.d.ts',
-    }) as Plugin,
+    }),
 
     Components({
       resolvers: [ElementPlusResolver()],
@@ -63,6 +63,11 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api/, ''),
       },
       '/static': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/bangumi': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,

@@ -122,6 +122,15 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/bangumi',
+    name: 'bangumi',
+    component: () => import('@/views/Bangumi.vue').then(m => m.default || m),
+    meta: {
+      title: '番剧时间表',
+      keepAlive: true,
+    },
+  },
+  {
     path: '/faq',
     name: 'faq',
     component: () => import('@/views/FAQ.vue').then(m => m.default || m),
