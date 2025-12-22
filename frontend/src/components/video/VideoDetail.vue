@@ -30,6 +30,10 @@
             {{ video.description }}
           </div>
         </div>
+        <!--评论区-->
+        <div class="comment-section">
+          <CommentList :video-id="videoId" />
+        </div>
       </div>
 
       <!-- 右侧栏 -->
@@ -50,6 +54,7 @@
   import { formatTime } from '@/utils/format';
   import VideoPlayer from './VideoPlayer.vue';
   import UserCard from '@/components/user/UserCard.vue';
+  import CommentList from '@/components/comment/CommentList.vue';
 
   const route = useRoute();
 
@@ -110,15 +115,11 @@
     .content-wrapper {
       display: flex;
       gap: 20px;
-
-      @media (max-width: 768px) {
-        flex-direction: column;
-      }
     }
 
     .main-content {
       flex: 1;
-      min-width: 0;
+      min-width: 600px; /* 设置最小宽度，确保内容区域不会被过度压缩 */
 
       .video-title {
         font-size: 24px;
@@ -165,22 +166,28 @@
     .rightbar {
       width: 300px;
 
-      @media (max-width: 768px) {
-        width: 100%;
+      .user-card-wrapper {
+        background-color: var(--el-bg-color);
+        border-radius: var(--el-border-radius-base);
+        padding: 16px;
+        margin-bottom: 16px;
       }
     }
 
-    .related-videos {
-      background-color: var(--el-bg-color);
-      border-radius: var(--el-border-radius-base);
-      padding: 20px;
-      margin-top: 20px;
+    /* 响应式布局 - 在小屏幕上垂直排列 */
+    @media (max-width: 992px) {
+      .content-wrapper {
+        flex-direction: column;
+      }
 
-      h3 {
-        font-size: 18px;
-        font-weight: 500;
-        color: var(--el-text-color-primary);
-        margin-bottom: 16px;
+      .main-content {
+        min-width: 100%;
+        order: 2; /* 主内容在下方 */
+      }
+
+      .rightbar {
+        width: 100%;
+        order: 1; /* 右侧栏在上方 */
       }
     }
   }

@@ -62,3 +62,24 @@ create index user_id
 
 ALTER TABLE `video-server`.user
     ADD COLUMN bio TEXT COMMENT '个人介绍';
+
+-- 评论表
+CREATE TABLE `comment`
+(
+    `id`          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    `video_id`    BIGINT NOT NULL COMMENT '视频ID',
+    `user_id`     BIGINT NOT NULL COMMENT '用户ID',
+    `content`     TEXT   NOT NULL COMMENT '评论内容',
+    `parent_id`   BIGINT   DEFAULT NULL COMMENT '父评论ID（用于回复）',
+    `status`      TINYINT  DEFAULT 1 COMMENT '状态：1-正常，0-删除',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 添加测试评论数据
+INSERT INTO `comment` (`video_id`, `user_id`, `content`, `parent_id`, `status`) 
+VALUES (1765434085906, 781181076234465280, '这个视频太棒了！讲解得非常清晰，学到了很多知识。', NULL, 1);
+
+INSERT INTO `comment` (`video_id`, `user_id`, `content`, `parent_id`, `status`) 
+VALUES (1765434085906, 785163957097099264, '感谢分享，内容很实用，期待更多优质视频！', NULL, 1);
+
