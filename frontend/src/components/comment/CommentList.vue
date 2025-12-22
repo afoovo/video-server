@@ -63,7 +63,7 @@
 
   const props = defineProps({
     videoId: {
-      type: Number,
+      type: String,
       required: true,
     },
   });
@@ -115,12 +115,12 @@
     comments.value = commentData.map(comment => {
       // 确保必要字段存在
       return {
-        id: comment.id,
+        id: String(comment.id),
         content: comment.content || '(无内容)',
-        videoId: comment.videoId,
-        userId: comment.userId,
+        videoId: String(comment.videoId),
+        userId: String(comment.userId),
         user: comment.user || {
-          id: comment.userId,
+          id: String(comment.userId),
           userName: '未知用户',
           avatarUrl: '/static/default/avatars/default.jpg',
         },
@@ -143,7 +143,7 @@
       const data = {
         videoId: props.videoId,
         content: commentText.value.trim(),
-        userId: currentUser.value?.id,
+        userId: String(currentUser.value?.id),
       };
       await createComment(data);
       ElMessage.success('评论发表成功');
@@ -166,7 +166,7 @@
   const handleDelete = async comment => {
     try {
       ElMessageBox.confirm('确定要删除这条评论吗？');
-      await deleteComment(comment.id);
+      await deleteComment(String(comment.id));
       ElMessage.success('删除成功');
       await loadComments();
     } catch (error) {
@@ -180,7 +180,8 @@
   // 判断是否可以删除评论
   const canDelete = comment =>
     isLoggedIn.value &&
-    (comment.userId === currentUser.value?.id || currentUser.value?.role === 'ADMIN');
+    (String(comment.userId) === String(currentUser.value?.id) ||
+      currentUser.value?.role === 'ADMIN');
 
   // 监听视频ID变化
   watch(

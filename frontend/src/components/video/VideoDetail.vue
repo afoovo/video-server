@@ -1,6 +1,12 @@
 <template>
   <div v-loading="loading" class="video-detail">
     <div class="content-wrapper">
+      <!-- 右侧栏 -->
+      <div class="rightbar">
+        <div v-if="video && video.userId" class="user-card-wrapper">
+          <UserCard :avatar-size="60" :show-account="true" :user-id="String(video.userId)" />
+        </div>
+      </div>
       <div class="main-content">
         <!-- 视频标题 -->
         <h1 v-if="video" class="video-title">
@@ -33,13 +39,6 @@
         <!--评论区-->
         <div class="comment-section">
           <CommentList :video-id="videoId" />
-        </div>
-      </div>
-
-      <!-- 右侧栏 -->
-      <div class="rightbar">
-        <div v-if="video && video.userId" class="user-card-wrapper">
-          <UserCard :avatar-size="60" :show-account="true" :user-id="video.userId" />
         </div>
       </div>
     </div>

@@ -1,16 +1,16 @@
 // 评论类型定义
 
 export interface Comment {
-  id: number;
+  id: string;
   content: string;
-  videoId: number;
-  userId: number;
+  videoId: string;
+  userId: string;
   createTime: string;
   updateTime?: string;
 }
 
 export interface CommentCreate {
   content: string;
-  videoId: number;
-  userId?: number;
+  videoId: string;
+  userId?: string;
 }
