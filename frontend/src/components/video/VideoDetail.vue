@@ -1,18 +1,7 @@
 <template>
   <div v-loading="loading" class="video-detail">
-    <div class="content-wrapper">
-      <!-- 右侧栏 -->
-      <div class="rightbar">
-        <div v-if="video && video.userId" class="user-card-wrapper">
-          <UserCard :avatar-size="60" :show-account="true" :user-id="String(video.userId)" />
-        </div>
-      </div>
-      <div class="main-content">
-        <!-- 视频标题 -->
-        <h1 v-if="video" class="video-title">
-          {{ video.title }}
-        </h1>
-
+    <div class="video-container">
+      <div class="left-container">
         <!-- 视频播放器 -->
         <div class="video-player-container">
           <VideoPlayer
@@ -24,8 +13,14 @@
             @error="handlePlayerError"
             @play="handlePlayerPlay"
             @ready="handlePlayerReady"
+            @pause="handlePlayerPause"
           />
         </div>
+
+        <!-- 视频标题 -->
+        <h1 v-if="video" class="video-title">
+          {{ video.title }}
+        </h1>
 
         <!-- 视频详情 -->
         <div v-if="video" class="video-description">
@@ -36,9 +31,31 @@
             {{ video.description }}
           </div>
         </div>
+
+        <!-- 用户信息卡片 -->
+        <div v-if="video && video.userId" class="user-info-card">
+          <UserCard :avatar-size="60" :show-account="true" :user-id="String(video.userId)" />
+        </div>
+
         <!--评论区-->
         <div class="comment-section">
           <CommentList :video-id="videoId" />
+        </div>
+      </div>
+
+      <div class="right-container">
+        <!-- 视频选项卡 -->
+        <div class="video-tabs">
+          <div class="tab-item active">弹幕</div>
+          <div class="tab-item">合集列表</div>
+        </div>
+
+        <!-- 推荐视频列表 -->
+        <div class="recommended-videos">
+          <div class="recommended-title">推荐列表</div>
+          <div class="video-list-placeholder">
+            <!-- 推荐视频会在此显示 -->
+          </div>
         </div>
       </div>
     </div>
@@ -93,6 +110,9 @@
   const handlePlayerPlay = () => {
     console.log('视频开始播放');
   };
+  const handlePlayerPause = () => {
+    console.log('视频暂停播放');
+  };
 
   const handlePlayerError = error => {
     console.error('播放器错误:', error);
@@ -106,27 +126,36 @@
 
 <style lang="scss" scoped>
   .video-detail {
-    max-width: 1200px;
-    margin: 0 auto;
+    position: relative;
     padding: 20px;
     min-height: 100vh;
 
-    .content-wrapper {
-      display: flex;
-      gap: 20px;
+    &::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('@/assets/PixPin_2025-12-22_15-41-20.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.3;
+      z-index: -1;
+      pointer-events: none;
     }
 
-    .main-content {
-      flex: 1;
-      min-width: 600px; /* 设置最小宽度，确保内容区域不会被过度压缩 */
+    .video-container {
+      display: flex;
+      gap: 20px;
+      margin: 0 auto;
+      max-width: 1400px;
+    }
 
-      .video-title {
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 16px;
-        text-align: left;
-        color: var(--el-text-color-primary);
-      }
+    .left-container {
+      flex: 1;
+      min-width: 0;
 
       .video-player-container {
         position: relative;
@@ -135,58 +164,149 @@
         padding-bottom: 56.25%;
         background: #000;
         margin-bottom: 20px;
-        border-radius: 4px;
+        border-radius: 8px;
         overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .video-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        text-align: left;
+        color: var(--el-text-color-primary);
+        line-height: 1.4;
       }
 
       .video-description {
-        padding: 20px;
+        padding: 16px;
         background: var(--el-bg-color);
-        border-radius: var(--el-border-radius-base);
-        margin-bottom: 20px;
+        border-radius: 8px;
+        margin-bottom: 16px;
         text-align: left;
-        //box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--el-border-color-lighter);
 
         .meta {
           color: var(--el-text-color-secondary);
-          margin-bottom: 15px;
-          padding-bottom: 15px;
+          margin-bottom: 12px;
+          padding-bottom: 12px;
           border-bottom: 1px solid var(--el-border-color-lighter);
+          font-size: 12px;
         }
 
         .description {
           white-space: pre-wrap;
           color: var(--el-text-color-regular);
-          line-height: 1.5;
+          line-height: 1.6;
+          font-size: 14px;
+        }
+      }
+
+      .user-info-card {
+        padding: 16px;
+        background: var(--el-bg-color);
+        border-radius: 8px;
+        margin-bottom: 16px;
+        border: 1px solid var(--el-border-color-lighter);
+      }
+
+      .comment-section {
+        margin-top: 20px;
+      }
+    }
+
+    .right-container {
+      width: 320px;
+      flex-shrink: 0;
+
+      .video-tabs {
+        display: flex;
+        background: var(--el-bg-color);
+        border-radius: 8px;
+        border: 1px solid var(--el-border-color-lighter);
+        margin-bottom: 16px;
+        overflow: hidden;
+
+        .tab-item {
+          flex: 1;
+          padding: 12px;
+          text-align: center;
+          font-size: 13px;
+          cursor: pointer;
+          border-right: 1px solid var(--el-border-color-lighter);
+          color: var(--el-text-color-regular);
+          transition: all 0.3s ease;
+
+          &:last-child {
+            border-right: none;
+          }
+
+          &:hover {
+            background: var(--el-fill-color-light);
+          }
+
+          &.active {
+            background: var(--el-color-primary);
+            color: #fff;
+          }
+        }
+      }
+
+      .recommended-videos {
+        background: var(--el-bg-color);
+        border-radius: 8px;
+        border: 1px solid var(--el-border-color-lighter);
+        overflow: hidden;
+
+        .recommended-title {
+          padding: 12px 16px;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--el-text-color-primary);
+          border-bottom: 1px solid var(--el-border-color-lighter);
+          background: var(--el-fill-color-light);
+        }
+
+        .video-list-placeholder {
+          padding: 20px;
+          min-height: 400px;
+          color: var(--el-text-color-secondary);
+          font-size: 12px;
         }
       }
     }
 
-    .rightbar {
-      width: 300px;
-
-      .user-card-wrapper {
-        background-color: var(--el-bg-color);
-        border-radius: var(--el-border-radius-base);
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-    }
-
-    /* 响应式布局 - 在小屏幕上垂直排列 */
-    @media (max-width: 992px) {
-      .content-wrapper {
+    /* 响应式布局 */
+    @media (max-width: 1024px) {
+      .video-container {
         flex-direction: column;
       }
 
-      .main-content {
-        min-width: 100%;
-        order: 2; /* 主内容在下方 */
+      .right-container {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      padding: 12px;
+
+      .video-container {
+        gap: 12px;
       }
 
-      .rightbar {
-        width: 100%;
-        order: 1; /* 右侧栏在上方 */
+      .left-container {
+        .video-title {
+          font-size: 18px;
+        }
+      }
+
+      .right-container {
+        .video-tabs {
+          .tab-item {
+            font-size: 12px;
+            padding: 10px;
+          }
+        }
       }
     }
   }
