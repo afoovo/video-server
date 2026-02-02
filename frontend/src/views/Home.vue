@@ -41,19 +41,6 @@
             @click="goToVideo(video.id)"
           />
         </div>
-
-        <!-- 分页 -->
-        <div class="pagination">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :total="total"
-            :page-sizes="PAGE_SIZES"
-            layout="total, sizes, prev, pager, next"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
-        </div>
       </div>
     </div>
   </div>
@@ -67,7 +54,6 @@
   import VideoCard from '@/components/video/VideoCard.vue';
 
   // 常量定义
-  const PAGE_SIZES = [24, 36, 48, 60];
   const DEFAULT_PAGE_SIZE = 20;
   const DEFAULT_SORT = 'latest';
 
@@ -165,17 +151,6 @@
 
   const handleSortChange = () => {
     currentPage.value = 1;
-    loadVideos();
-  };
-
-  const handleSizeChange = val => {
-    pageSize.value = val;
-    currentPage.value = 1; // 重置到第一页
-    loadVideos();
-  };
-
-  const handleCurrentChange = val => {
-    currentPage.value = val;
     loadVideos();
   };
 

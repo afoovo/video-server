@@ -54,15 +54,33 @@
 
 <style lang="scss" scoped>
   @use '@/styles/variables' as *;
+  
+  // 混入函数定义
+  @mixin flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  @mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  @mixin hover-transition {
+    transition: all 0.3s ease;
+  }
 
   .app-footer {
-    padding: $spacing-lg 0;
-    background-color: $background-color; // 使用已定义的背景色变量
+    height: $footer-height;
+    background-color: $white;
     border-top: 1px solid $border-color;
+    padding: $spacing-md 0;
 
     .footer-content {
-      max-width: 1200px;
       margin: 0 auto;
+      @include flex-between;
       padding: 0 $spacing-lg;
       display: flex;
       justify-content: space-between;
@@ -87,6 +105,8 @@
             a {
               color: $text-color-secondary;
               text-decoration: none;
+              font-size: $font-size-sm;
+              @include hover-transition;
 
               &:hover {
                 color: $primary-color;
@@ -102,6 +122,7 @@
           a {
             color: $text-color-secondary;
             font-size: $font-size-xl;
+            @include hover-transition;
 
             &:hover {
               color: $primary-color;
@@ -119,15 +140,20 @@
     }
   }
 
-  // 响应式样式
-  @media (max-width: $breakpoint-sm) {
+  // 响应式布局优化
+  @media (max-width: $breakpoint-md) {
     .app-footer {
       .footer-content {
         flex-direction: column;
-        gap: $spacing-lg;
+        gap: $spacing-md;
+        text-align: center;
 
         .footer-section {
           margin-bottom: $spacing-md;
+        }
+
+        .social-links {
+          @include flex-center;
         }
       }
     }

@@ -187,7 +187,7 @@
   watch(
     () => props.videoId,
     (newId, oldId) => {
-      console.log(`视频ID变化: ${oldId} => ${newId}`);
+      // console.log(`视频ID变化: ${oldId} => ${newId}`);
       if (newId) {
         loadComments();
       }
@@ -197,7 +197,7 @@
 
   // 初始化
   onMounted(() => {
-    console.log('评论组件加载，视频ID:', props.videoId);
+    // console.log('评论组件加载，视频ID:', props.videoId);
     if (props.videoId) {
       loadComments();
     }

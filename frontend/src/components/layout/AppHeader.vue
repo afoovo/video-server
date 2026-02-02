@@ -146,7 +146,6 @@
     z-index: $zindex-fixed;
 
     .header-content {
-      max-width: 1200px;
       height: 100%;
       margin: 0 auto;
       padding: 0 $spacing-lg;

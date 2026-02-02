@@ -398,7 +398,6 @@
   @use '@/styles/mixins' as *;
 
   .user-profile {
-    max-width: 1200px;
     margin: 0 auto;
     padding: $spacing-lg;
   }

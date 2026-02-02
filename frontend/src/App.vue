@@ -24,19 +24,15 @@
 </script>
 
 <style lang="scss">
-  // 导入全局样式
   @use './styles/global';
 
   .app-container {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
 
     .main-content {
       flex: 1;
       padding: var(--spacing-lg);
-      max-width: 1200px;
-      margin: 0 auto;
       width: 100%;
       box-sizing: border-box;
     }

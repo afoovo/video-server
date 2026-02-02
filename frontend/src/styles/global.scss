@@ -57,6 +57,7 @@
 
     .art-progress {
       background: GrayText;
+
       &-played {
         background: Highlight;
       }
@@ -84,7 +85,6 @@
 
 // 通用布局类
 .page-container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: $spacing-md;
 }
@@ -347,7 +347,7 @@
   z-index: $zindex-fixed;
 
   .header-content {
-    max-width: 1200px;
+
     height: 100%;
     margin: 0 auto;
     padding: 0 $spacing-lg;
@@ -424,7 +424,7 @@
   border-top: 1px solid $border-color;
 
   .footer-content {
-    max-width: 1200px;
+
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -754,7 +754,6 @@
 }
 
 
-
 // 注册页面样式
 .register-container {
   display: flex;
@@ -811,7 +810,6 @@
       }
     }
   }
-
 
 
   .register-container {
