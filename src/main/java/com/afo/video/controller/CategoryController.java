@@ -3,14 +3,17 @@ package com.afo.video.controller;
 import com.afo.video.common.api.AjaxResult;
 import com.afo.video.domain.Category;
 import com.afo.video.domain.Video;
-import com.afo.video.service.CategoryService;
-import com.afo.video.service.VideoService;
+import com.afo.video.mapper.CategoryMapper;
+import com.afo.video.mapper.VideoMapper;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.annotation.Path;
 
 import java.util.List;
+
+import static com.afo.video.domain.table.VideoTableDef.VIDEO; // 类型安全的最佳实践
 
 /**
  * 分类控制器
@@ -19,9 +22,9 @@ import java.util.List;
 @Mapping("/category")
 public class CategoryController {
     @Inject
-    private CategoryService categoryService;
+    private CategoryMapper categoryMapper;
     @Inject
-    private VideoService videoService;
+    private VideoMapper videoMapper;
 
     /**
      * 获取所有分类
@@ -30,7 +33,7 @@ public class CategoryController {
      */
     @Mapping("/list")
     public Object list() {
-        List<Category> categories = categoryService.list();
+        List<Category> categories = categoryMapper.selectListByQuery(QueryWrapper.create());
         return AjaxResult.ok(categories);
     }
 
@@ -42,7 +45,7 @@ public class CategoryController {
      */
     @Mapping("/{id}")
     public Object detail(@Path("id") Long id) {
-        Category category = categoryService.getById(id);
+        Category category = categoryMapper.selectOneById(id);
         return AjaxResult.ok(category);
     }
 
@@ -54,7 +57,8 @@ public class CategoryController {
      */
     @Mapping("/{id}/videoList")
     public Object categoryVideoList(@Path("id") Long id) {
-        List<Video> videos = videoService.listByCategoryId(id);
+        List<Video> videos = videoMapper.selectListByQuery(
+                QueryWrapper.create().select().from(VIDEO).where(VIDEO.CATEGORY_ID.eq(id)));
         return AjaxResult.ok(videos);
     }
 
@@ -66,7 +70,7 @@ public class CategoryController {
      */
     @Mapping("/saveOrUpdate")
     public Object saveOrUpdate(Category category) {
-        boolean result = categoryService.saveOrUpdate(category);
+        boolean result = categoryMapper.insertOrUpdate(category) > 0;
         return AjaxResult.ok(result);
     }
 
@@ -78,7 +82,7 @@ public class CategoryController {
      */
     @Mapping("/delete/{id}")
     public Object delete(@Path("id") Long id) {
-        boolean result = categoryService.removeById(id);
+        boolean result = categoryMapper.deleteById(id) > 0;
         return AjaxResult.ok(result);
     }
 }

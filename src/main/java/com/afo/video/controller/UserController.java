@@ -4,15 +4,19 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.afo.video.common.api.AjaxResult;
 import com.afo.video.domain.User;
 import com.afo.video.domain.Video;
+import com.afo.video.mapper.UserMapper;
+import com.afo.video.mapper.VideoMapper;
 import com.afo.video.service.FileService;
-import com.afo.video.service.UserService;
-import com.afo.video.service.VideoService;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.noear.solon.annotation.*;
 import org.noear.solon.core.handle.UploadedFile;
 import org.noear.solon.validation.annotation.Valid;
 
 import java.util.List;
+
+import static com.afo.video.domain.table.UserTableDef.USER;
+import static com.afo.video.domain.table.VideoTableDef.VIDEO;
 
 /**
  * 用户控制器
@@ -22,9 +26,9 @@ import java.util.List;
 public class UserController {
 
     @Inject
-    private UserService userService;
+    private UserMapper userMapper;
     @Inject
-    private VideoService videoService;
+    private VideoMapper videoMapper;
     @Inject
     private FileService fileService;
 
@@ -35,7 +39,7 @@ public class UserController {
      */
     @Mapping("/list")
     public Object list() {
-        List<User> all = userService.list();
+        List<User> all = userMapper.selectListByQuery(QueryWrapper.create());
         return AjaxResult.ok(all);
     }
 
@@ -48,7 +52,7 @@ public class UserController {
      */
     @Mapping("/page")
     public Object page(int pageNum, int pageSize) {
-        Page<User> page = userService.page(new Page<>(pageNum, pageSize));
+        Page<User> page = userMapper.paginate(new Page<>(pageNum, pageSize), QueryWrapper.create());
         return AjaxResult.ok(page);
     }
 
@@ -60,7 +64,12 @@ public class UserController {
      */
     @Mapping("/search/{keyword}")
     public Object search(@Path("keyword") String keyword) {
-        List<User> users = userService.search(keyword);
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .select()
+                .from(USER)
+                .where(USER.USER_NAME.like(keyword))
+                .or(USER.ACCOUNT.like(keyword));
+        List<User> users = userMapper.selectListByQuery(queryWrapper);
         return AjaxResult.ok(users);
     }
 
@@ -73,7 +82,7 @@ public class UserController {
     @Valid
     @Mapping("/get/{id}")
     public Object getById(@Path("id") Long id) {
-        User user = userService.getById(id);
+        User user = userMapper.selectOneById(id);
         if (user == null) {
             return AjaxResult.error("用户不存在");
         }
@@ -90,7 +99,8 @@ public class UserController {
     @Valid
     @Mapping("/{id}/videoList")
     public Object userVideoList(@Path("id") Long id) {
-        List<Video> videos = videoService.listByUserId(id);
+        List<Video> videos = videoMapper.selectListByQuery(
+                QueryWrapper.create().select().from(VIDEO).where(VIDEO.USER_ID.eq(id)));
         return AjaxResult.ok(videos);
     }
 
@@ -103,7 +113,7 @@ public class UserController {
     @Post
     @Mapping("/add")
     public Object add(@Body User user) {
-        boolean success = userService.save(user);
+        boolean success = userMapper.insert(user) > 0;
         if (success) {
             return AjaxResult.ok("用户添加成功");
         } else {
@@ -120,7 +130,7 @@ public class UserController {
     @Put
     @Mapping("/update")
     public Object update(@Body User user) {
-        boolean success = userService.updateById(user);
+        boolean success = userMapper.update(user) > 0;
         if (success) {
             return AjaxResult.ok("用户更新成功");
         } else {
@@ -137,7 +147,7 @@ public class UserController {
     @Delete
     @Mapping("/delete/{id}")
     public Object delete(@Path("id") Long id) {
-        boolean success = userService.removeById(id);
+        boolean success = userMapper.deleteById(id) > 0;
         if (success) {
             return AjaxResult.ok("用户删除成功");
         } else {

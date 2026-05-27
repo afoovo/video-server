@@ -2,8 +2,9 @@ package com.afo.video.controller;
 
 import com.afo.video.common.api.AjaxResult;
 import com.afo.video.domain.Video;
-import com.afo.video.service.VideoService;
+import com.afo.video.mapper.VideoMapper;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -11,6 +12,8 @@ import org.noear.solon.annotation.Path;
 import org.noear.solon.validation.annotation.Valid;
 
 import java.util.List;
+
+import static com.afo.video.domain.table.VideoTableDef.VIDEO;
 
 /**
  * 视频列表控制器
@@ -20,7 +23,7 @@ import java.util.List;
 public class VideoController {
 
     @Inject
-    private VideoService videoService;
+    private VideoMapper videoMapper;
 
     /**
      * 查询所有视频
@@ -29,7 +32,7 @@ public class VideoController {
      */
     @Mapping("/list")
     public Object list() {
-        List<Video> all = videoService.list();
+        List<Video> all = videoMapper.selectListByQuery(QueryWrapper.create());
         return AjaxResult.ok(all);
     }
 
@@ -42,8 +45,9 @@ public class VideoController {
      */
     @Mapping("/page")
     public Object page(int pageNum, int pageSize) {
-        Page<Video> page = videoService.page(new Page<>(pageNum, pageSize));//需要new一个page
-        return AjaxResult.ok(page.getRecords());//当前页的记录
+        // 优化性能的分页接口
+        Page<Video> page = videoMapper.paginate(new Page<>(pageNum, pageSize), QueryWrapper.create()); // 需要new一个page
+        return AjaxResult.ok(page.getRecords()); // 当前页的记录
     }
 
     /**
@@ -54,7 +58,12 @@ public class VideoController {
      */
     @Mapping("/search/{keyword}")
     public Object search(@Path("keyword") String keyword) {
-        List<Video> videos = videoService.search(keyword);
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .select()
+                .from(VIDEO)
+                .where(VIDEO.TITLE.like(keyword))
+                .or(VIDEO.DESCRIPTION.like(keyword));
+        List<Video> videos = videoMapper.selectListByQuery(queryWrapper);
         return AjaxResult.ok(videos);
     }
 
@@ -68,7 +77,7 @@ public class VideoController {
     @Valid
     @Mapping("/{Id}")
     public Object get(@Path("Id") Long Id) {
-        Video video = videoService.getById(Id);
+        Video video = videoMapper.selectOneById(Id);
         if (video == null) {
             return AjaxResult.error("视频不存在");
         }
