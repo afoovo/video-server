@@ -77,30 +77,37 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--        flex-demo后引入-->
+        <!-- flex-demo后引入-->
         <!-- MySQL驱动 -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
-        <!--        aws-s3协议，兼容minio、Rust-FS-->
+        <!-- aws-s3协议，兼容minio、Rust-FS-->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>file-s3-solon-cloud-plugin</artifactId>
             <version>3.7.1</version>
         </dependency>
-        <!--        Sa-Token 插件 -->
+        <!-- Sa-Token 插件 -->
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-solon-plugin</artifactId>
             <version>1.44.0</version>
         </dependency>
-        <!--        分布式id生成，基于snowflake算法，不导入不能用CloudClient.id().generate()-->
+        <!-- 分布式id生成，基于snowflake算法，不导入不能用CloudClient.id().generate()-->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>snowflake-id-solon-cloud-plugin</artifactId>
         </dependency>
+        <!-- easy-es 插件 -->
+        <dependency>
+            <groupId>org.dromara.easy-es</groupId>
+            <artifactId>easy-es-solon-plugin</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
